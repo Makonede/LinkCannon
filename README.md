@@ -13,6 +13,9 @@ To install Link Cannon, download the [latest release](https://github.com/Makoned
 > **Warning**
 > There is a high chance that this mod will not work with other mods. Using other mods in combination with Link Cannon is not supported — do so at your own risk.
 
+## Updating the mod
+To update the mod, simply uninstall the mod with the instructions below and then install the latest version.
+
 ## Uninstallation
 > **Warning**
 > If you are using Link Cannon with other mods, this step will likely remove all of your other Breath of the Wild mods.

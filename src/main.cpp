@@ -16,3 +16,6 @@ extern "C" void _main() {
     callEvent(nullptr, &eventName, &eventName, nullptr, true, false);
   }
 }
+
+
+extern "C" void fini() {}

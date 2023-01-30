@@ -28,7 +28,7 @@ ARCH := -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
 CFLAGS := -g -Wall -ffunction-sections -O3 $(ARCH) $(DEFINES) $(INCLUDE)
 CXXFLAGS := $(CFLAGS) -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive -std=c++2a
 ASFLAGS := -g $(ARCH)
-LDFLAGS := -specs=$(SWITCH_SPECS) -g $(ARCH) -Wl,-Map,$(TARGET).map -Wl,--version-script=$(LINKER_VERSION_SCRIPT) -Wl,-init=_main -Wl,--export-dynamic -nodefaultlibs
+LDFLAGS := -specs=$(SWITCH_SPECS) -g $(ARCH) -Wl,-Map,$(TARGET).map -Wl,--version-script=$(LINKER_VERSION_SCRIPT) -Wl,-init=_main -Wl,-fini=fini -Wl,--export-dynamic -nodefaultlibs
 LIBS := -lgcc -lstdc++ -u malloc
 LIBPATHS := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 DEPSDIR ?= .
