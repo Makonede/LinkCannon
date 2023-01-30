@@ -23,7 +23,7 @@ To update the mod, simply uninstall the mod with the instructions below and then
 To uninstall Link Cannon, delete the folder `/atmosphere/contents/01007EF00011E000` from your microSD card.
 
 ## Usage
-Once the mod is installed, it will automatically load when starting the game. To launch Breath of the Wild with Link Cannon temporarily disabled, hold ![L](https://restite.org/dpad/L) after selecting a user.
+Once the mod is installed, it will automatically load when starting the game. To launch Breath of the Wild with Link Cannon temporarily disabled, hold ![L](https://restite.org/dpad/l) after selecting a user.
 
 ![D-pad Up and Right Stick](https://restite.org/dpad/8o)
 
