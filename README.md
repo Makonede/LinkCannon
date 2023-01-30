@@ -1,4 +1,5 @@
 # Link Cannon
+![BTB](https://repository-images.githubusercontent.com/594929966/db09df55-f0ea-40e7-bd3e-dc1a84c60455)
 A mod for The Legend of Zelda: Breath of the Wild (Switch 1.6.0) that aims to help with BTB setups.
 
 ## Installation
