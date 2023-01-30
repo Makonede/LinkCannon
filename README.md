@@ -3,7 +3,7 @@ A mod for The Legend of Zelda: Breath of the Wild (Switch 1.6.0) that aims to he
 
 ## Installation
 ### Prerequisite
-- A homebrewed switch running [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere)
+- A homebrewed Nintendo Switch running [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere)
 
 To install Link Cannon, download the [latest release](https://github.com/Makonede/LinkCannon/releases/latest) and extract it onto the root of your microSD card.
 
