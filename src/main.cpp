@@ -6,7 +6,7 @@
 #include <cstdlib>
 
 
-[[noreturn]] [[maybe_unused]] void _main([[maybe_unused]] void *unused) {
+[[noreturn]] void _main([[maybe_unused]] void *unused) {
   auto trigger = &triggerAddr;
   sead::SafeString eventName("LinkCannon");
 
@@ -18,7 +18,7 @@
 }
 
 
-[[maybe_unused]] extern "C" void init() {
+extern "C" void init() {
   static nn::os::ThreadType mainThread;
   constexpr auto stackSize = 0x80000uz;
   auto stack = aligned_alloc(0x1000uz, stackSize);
@@ -34,4 +34,4 @@
 }
 
 
-[[maybe_unused]] extern "C" void fini() {}
+extern "C" void fini() {}
