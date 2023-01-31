@@ -18,7 +18,7 @@
 }
 
 
-[[noreturn]] [[maybe_unused]] extern "C" void init() {
+[[maybe_unused]] extern "C" void init() {
   static nn::os::ThreadType mainThread;
   constexpr auto stackSize = 0x80000uz;
   auto stack = aligned_alloc(0x1000uz, stackSize);
@@ -33,4 +33,4 @@
 }
 
 
-[[noreturn]] [[maybe_unused]] extern "C" void fini() {}
+[[maybe_unused]] extern "C" void fini() {}
