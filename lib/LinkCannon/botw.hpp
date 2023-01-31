@@ -9,7 +9,7 @@ typedef bool (*CALL_EVENT)(
   bool
 );
 
-[[maybe_unused]] extern bool callEvent(
+extern bool callEvent(
   void *, sead::SafeString *, sead::SafeString *, sead::Matrix34<float> *, bool,
   bool
 );
