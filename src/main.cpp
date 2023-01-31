@@ -23,7 +23,7 @@ void _main(void *unused) {
 extern "C" void init() {
   static nn::os::ThreadType mainThread;
   constexpr auto stackSize = 0x80000uz;
-  void *stack = aligned_alloc(0x1000uz, stackSize);
+  auto stack = aligned_alloc(0x1000uz, stackSize);
 
   if (nn::os::CreateThread(
     &mainThread, _main, nullptr, stack, stackSize, 16, 0
