@@ -9,7 +9,7 @@
 void _main(void *unused) {
   (unused);
 
-  const auto trigger = &triggerAddr;
+  auto trigger = &triggerAddr;
   sead::SafeString eventName("LinkCannon");
 
   while (true) {
