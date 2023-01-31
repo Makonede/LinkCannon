@@ -13,3 +13,5 @@ extern bool callEvent(
   void *, sead::SafeString *, sead::SafeString *, sead::Matrix34<float> *, bool,
   bool
 );
+
+extern bool trigger;
