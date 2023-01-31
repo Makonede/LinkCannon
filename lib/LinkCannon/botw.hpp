@@ -14,4 +14,4 @@ extern bool callEvent(
   bool
 );
 
-extern bool trigger;
+extern bool triggerAddr;
