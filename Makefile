@@ -10,7 +10,7 @@ SOURCE_DIR := $(ROOT_DIR)/src/
 CONFIG_DIR := $(ROOT_DIR)/config
 ALL_SOURCES_DIRS := $(shell find $(SOURCE_DIR) -type d)
 LIBDIRS := $(PORTLIBS) $(LIBNX)
-ALL_INCLUDE_DIRS := $(SOURCE_DIR) $(LIB_DIR)/sead/include $(LIB_DIR)/LinkCannon
+ALL_INCLUDE_DIRS := $(SOURCE_DIR) $(LIB_DIR)/sead/include $(LIB_DIR)/LinkCannon $(LIB_DIR)/nnheaders/include
 VPATH := $(foreach dir,$(ALL_SOURCES_DIRS),$(CURDIR)/$(dir))
 LDSCRIPT := $(CONFIG_DIR)/symbols.ld
 LINKER_VERSION_SCRIPT := $(CONFIG_DIR)/exported
@@ -28,7 +28,7 @@ ARCH := -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
 CFLAGS := -g -Wall -ffunction-sections -O3 $(ARCH) $(DEFINES) $(INCLUDE)
 CXXFLAGS := $(CFLAGS) -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive -std=c++2a
 ASFLAGS := -g $(ARCH)
-LDFLAGS := -specs=$(SWITCH_SPECS) -g $(ARCH) -Wl,-Map,$(TARGET).map -Wl,--version-script=$(LINKER_VERSION_SCRIPT) -Wl,-init=_main -Wl,-fini=fini -Wl,--export-dynamic -nodefaultlibs
+LDFLAGS := -specs=$(SWITCH_SPECS) -g $(ARCH) -Wl,-Map,$(TARGET).map -Wl,--version-script=$(LINKER_VERSION_SCRIPT) -Wl,-init=init -Wl,-fini=fini -Wl,--export-dynamic -nodefaultlibs
 LIBS := -lgcc -lstdc++ -u malloc
 LIBPATHS := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 DEPSDIR ?= .
