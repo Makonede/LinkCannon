@@ -26,6 +26,7 @@
   if (nn::os::CreateThread(
     &mainThread, _main, nullptr, stack, stackSize, 16, 0
   ).IsFailure()) [[unlikely]] {
+    free(stack);
     return;
   }
 
