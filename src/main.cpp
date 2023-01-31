@@ -6,7 +6,23 @@
 #include <cstdlib>
 
 
+#if __has_cpp_attribute(noreturn)
+#if __has_cpp_attribute(maybe_unused)
 [[noreturn]] void _main([[maybe_unused]] void *unused) {
+#else
+[[noreturn]] void _main(void *unused) {
+  static_cast<void>(unused);
+
+#endif
+#else
+#if __has_cpp_attribute(maybe_unused)
+void _main([[maybe_unused]] void *unused) {
+#else
+void _main(void *unused) {
+  static_cast<void>(unused);
+
+#endif
+#endif
   auto trigger = &triggerAddr;
   sead::SafeString eventName("LinkCannon");
 
@@ -25,7 +41,11 @@ extern "C" void init() {
 
   if (nn::os::CreateThread(
     &mainThread, _main, nullptr, stack, stackSize, 16, 0
+#if __has_cpp_attribute(unlikely)
   ).IsFailure()) [[unlikely]] {
+#else
+  ).IsFailure()) {
+#endif
     free(stack);
     return;
   }
