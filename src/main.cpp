@@ -9,10 +9,7 @@
 void _main(void *unused) {
   (unused);
 
-  constexpr auto mainBase = -0x3483000ull;
-  const auto triggerOffset = reinterpret_cast<unsigned char *>(0x2d562f0ull);
-
-  const auto trigger = reinterpret_cast<bool *>(mainBase + triggerOffset);
+  const auto trigger = &triggerAddr;
   sead::SafeString eventName("LinkCannon");
 
   while (true) {
