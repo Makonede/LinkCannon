@@ -27,30 +27,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
-#if __has_cpp_attribute(noreturn)
-#if __has_cpp_attribute(maybe_unused)
 [[noreturn]] void _main([[maybe_unused]] void *unused) {
-#else  // __has_cpp_attribute(maybe_unused)
-[[noreturn]] void _main(void *unused) {
-  static_cast<void>(unused);
-
-#endif  // __has_cpp_attribute(maybe_unused)
-#else  // __has_cpp_attribute(noreturn)
-#if __has_cpp_attribute(maybe_unused)
-void _main([[maybe_unused]] void *unused) {
-#else  // __has_cpp_attribute(maybe_unused)
-void _main(void *unused) {
-  static_cast<void>(unused);
-
-#endif  // __has_cpp_attribute(maybe_unused)
-#endif  // __has_cpp_attribute(noreturn)
   const auto trigger = &triggerAddr;
   sead::SafeString eventName("LinkCannon");
 
   while (true) {
     // Wait until trigger points to true. This will happen when the button
     // combination is pressed.
-    while (!*trigger) {}
+    while (!*trigger) [[likely]] {}
     *trigger = false;
     callEvent(nullptr, &eventName, &eventName, nullptr, true, false);
   }
@@ -68,11 +52,7 @@ extern "C" void init() {
   // Attempt to create the main thread
   if (nn::os::CreateThread(
     &mainThread, _main, nullptr, stack, stackSize, 16, 0
-#if __has_cpp_attribute(unlikely)
   ).IsFailure()) [[unlikely]] {
-#else
-  ).IsFailure()) {
-#endif  // __has_cpp_attribute(unlikely)
     // Free the thread stack if it fails
     free(stack);
     return;
