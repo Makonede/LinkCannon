@@ -44,7 +44,7 @@ void _main(void *unused) {
 
 #endif  // __has_cpp_attribute(maybe_unused)
 #endif  // __has_cpp_attribute(noreturn)
-  auto trigger = &triggerAddr;
+  const auto trigger = &triggerAddr;
   sead::SafeString eventName("LinkCannon");
 
   while (true) {
