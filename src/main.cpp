@@ -29,7 +29,7 @@ constexpr auto BUTTON_COMBO = 0x00010040;
 
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
-[[noreturn]] void _main([[maybe_unused]] void *unused) {
+[[noreturn]] auto _main([[maybe_unused]] auto unused) {
   auto controller = getController(0);
   sead::SafeString eventName("LinkCannon");
 
@@ -44,7 +44,7 @@ constexpr auto BUTTON_COMBO = 0x00010040;
 
 
 // Initialization function (entrypoint)
-extern "C" void init() {
+extern "C" auto init() {
   static nn::os::ThreadType mainThread;
 
   // Allocate memory for the main thread stack
@@ -66,4 +66,4 @@ extern "C" void init() {
 
 
 // Finalization function
-extern "C" void fini() {}
+extern "C" auto fini() {}
