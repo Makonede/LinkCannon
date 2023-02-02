@@ -22,7 +22,8 @@ make -C build -f ..\Makefile || exit /b
 rd /s /q release || exit /b
 md %RELEASE_PATH%\exefs || exit /b
 md %RELEASE_PATH%\romfs\System || exit /b
-echo 1.6.0-LC%VERSION% > %RELEASE_PATH%\romfs\System\Version.txt || exit /b
+< NUL set /p =1.6.0-LC%VERSION% > %RELEASE_PATH%\romfs\System\Version.txt || exit /b
+cmd /c "exit /b 0"
 copy build\linkcannon.nso %RELEASE_PATH%\exefs\subsdk9 || exit /b
 copy build\app.npdm %RELEASE_PATH%\exefs\main.npdm || exit /b
 robocopy romfs %RELEASE_PATH%\romfs /e /mt
