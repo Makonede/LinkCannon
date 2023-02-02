@@ -34,4 +34,4 @@ extern bool callEvent(
   bool
 );
 
-extern sead::ControllerMgr controllerMgr;
+extern sead::ControllerMgr *controllerMgr;
