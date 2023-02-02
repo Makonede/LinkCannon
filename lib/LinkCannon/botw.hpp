@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <controller/seadControllerMgr.h>
 #include <math/seadMatrix.hpp>
 #include <prim/seadSafeString.hpp>
 
@@ -34,3 +35,5 @@ extern bool callEvent(
 );
 
 extern bool triggerAddr;
+
+extern sead::ControllerMgr controllerMgr;
