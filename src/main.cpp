@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
-constexpr auto BUTTON_COMBO = 0x00010040;
+constexpr auto BUTTON_COMBO = 0x00010060;
 
 
 // Main loop thread
