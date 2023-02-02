@@ -17,26 +17,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#include <botw.hpp>
+#include <controller.hpp>
 
 #include <nn/os.h>
-#include <prim/seadSafeString.hpp>
 
 #include <cstdlib>
+
+
+constexpr auto BUTTON_COMBO = 0x00010040;
 
 
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
 [[noreturn]] void _main([[maybe_unused]] void *unused) {
-  const auto trigger = &triggerAddr;
+  auto controller = getController(0);
   sead::SafeString eventName("LinkCannon");
 
-  while (true) {
-    // Wait until trigger points to true. This will happen when the button
-    // combination is pressed.
-    while (!*trigger) [[likely]] {}
-    *trigger = false;
+  while (true) [[likely]] {
+    // Wait until the button combination is pressed
+    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {}
     callEvent(nullptr, &eventName, &eventName, nullptr, true, false);
+    // Wait until at least one of the buttons in the combination is released
+    while (controller->isHoldAll(BUTTON_COMBO)) [[unlikely]] {}
   }
 }
 
