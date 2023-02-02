@@ -23,3 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 auto getController = controllerMgr.getController;
+
+
+auto holdingOnly(auto controller, auto buttons);
