@@ -29,7 +29,7 @@ To uninstall Link Cannon, delete the folder `/atmosphere/contents/01007EF00011E0
 ## Usage
 Once the mod is installed, it will automatically load when starting the game. To launch Breath of the Wild with Link Cannon temporarily disabled, hold ![L](https://restite.org/dpad/l) after selecting a user.
 
-![D-pad Up and Right Stick](https://restite.org/dpad/8o)
+![ZR, D-pad Up and Right Stick](https://restite.org/dpad/R8o)
 
 This button combination will open the BTB simulation dialog — from there, just follow the given instructions.
 
