@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <botw.hpp>
 
 
-auto getController = controllerMgr.getController;
+auto getController = controllerMgr->getController;
 
 
 auto holdingOnly(auto controller, auto buttons);
