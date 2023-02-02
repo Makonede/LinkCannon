@@ -34,6 +34,4 @@ extern bool callEvent(
   bool
 );
 
-extern bool triggerAddr;
-
 extern sead::ControllerMgr controllerMgr;
