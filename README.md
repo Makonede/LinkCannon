@@ -33,6 +33,9 @@ Once the mod is installed, it will automatically load when starting the game. To
 
 This button combination will open the BTB simulation dialog — from there, just follow the given instructions.
 
+> **Note**
+> The button combination will not work if any other buttons are pressed.
+
 ## Building from source
 ### Prerequisite
 - devkitPro [`switch-dev`](https://switchbrew.org/wiki/Setting_up_Development_Environment) (devkitA64 and libnx)
