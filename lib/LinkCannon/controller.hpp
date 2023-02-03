@@ -22,6 +22,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <botw.hpp>
 
 
+enum class btn {
+  A = 0x00000001,
+  B = 0x00000002,
+  ZL = 0x00000004,
+  X = 0x00000008,
+  Y = 0x00000010,
+  ZR = 0x00000020,
+  R3 = 0x00000040,
+  L3 = 0x00000080,
+  MINUS = 0x00000200,
+  PLUS = 0x00000400,
+  HOME = 0x00000800,
+  CAPTURE = 0x00001000,
+  L = 0x00002000,
+  R = 0x00004000,
+  TOUCH = 0x00008000,
+  UP = 0x00010000,
+  DOWN = 0x00020000,
+  LEFT = 0x00040000,
+  RIGHT = 0x00080000,
+  L_UP = 0x00100000,
+  L_DOWN = 0x00200000,
+  L_LEFT = 0x00400000,
+  L_RIGHT = 0x00800000,
+  R_UP = 0x01000000,
+  R_DOWN = 0x02000000,
+  R_LEFT = 0x04000000,
+  R_RIGHT = 0x08000000
+};
+
 auto getController = controllerMgr->getController;
 
 
