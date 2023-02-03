@@ -48,12 +48,16 @@ extern "C" auto init() {
   static nn::os::ThreadType mainThread;
 
   // Allocate memory for the main thread stack
-  constexpr auto stackSize = 0x80000uz;
-  auto stack = aligned_alloc(0x1000uz, stackSize);
+  constexpr auto STACK_SIZE = 0x80000uz;
+  constexpr auto ALIGNMENT = 0x1000uz;
+  auto stack = aligned_alloc(ALIGNMENT, STACK_SIZE);
 
   // Attempt to create the main thread
+  constexpr auto PRIORITY = 16;
+
   if (nn::os::CreateThread(
-    &mainThread, _main, nullptr, stack, stackSize, 16, 0
+    &mainThread, _main, nullptr, stack,
+    static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
   ).IsFailure()) [[unlikely]] {
     // Free the thread stack if it fails
     free(stack);
