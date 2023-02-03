@@ -52,6 +52,10 @@ extern "C" auto init() {
   constexpr auto ALIGNMENT = 0x1000uz;
   auto stack = aligned_alloc(ALIGNMENT, STACK_SIZE);
 
+  if (stack == nullptr) {
+    return;
+  }
+
   // Attempt to create the main thread
   constexpr auto PRIORITY = 16;
 
