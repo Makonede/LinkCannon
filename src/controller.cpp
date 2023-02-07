@@ -18,8 +18,3 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 #include <controller.hpp>
-
-
-auto holdingOnly(auto controller, auto buttons) {
-  return controller->isHoldAll(buttons) && !controller->isHold(~buttons);
-}

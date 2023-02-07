@@ -4,3 +4,6 @@
 [submodule "lib/nnheaders"]
 	path = lib/nnheaders
 	url = https://github.com/open-ead/nnheaders
+[submodule "ukmm/ukmm"]
+	path = ukmm/ukmm
+	url = https://github.com/NiceneNerd/ukmm.git

@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bash -Eeuxo pipefail
 
-# compile - Autobuild Bash script for UNIX.
+# deploy - UKMM autodeploy Bash script for UNIX.
 # Copyright (C) 2023  Makonede
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-VERSION=0.1
-TID=01007EF00011E000
-RELEASE_PATH=release/atmosphere/contents/$TID
+CMAKE_VERSION=3.25.2
 
-make -C build -f ../Makefile
-rm -rf release/
-mkdir -p $RELEASE_PATH/exefs
-mkdir -p $RELEASE_PATH/romfs/System
-echo -n 1.6.0-LC$VERSION > $RELEASE_PATH/romfs/System/Version.txt
-cp -Rf build/linkcannon.nso $RELEASE_PATH/exefs/subsdk9
-cp -Rf build/app.npdm $RELEASE_PATH/exefs/main.npdm
-cp -Rf romfs/ $RELEASE_PATH/
+if ! hash rustc 2> /dev/null; then
+  curl -fSs https://sh.rustup.rs | sh -s -- -y --default-host x86_64-unknown-linux-gnu --default-toolchain nightly --profile complete
+fi
 
-set +x
-echo
-echo Build complete. To install, copy the contents of the release folder onto the
-echo root of your microSD card.
-read -n1 -r -p "Press any key to continue..."
+if ! hash cmake 2> /dev/null; then
+  curl -fLSs https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh | sh -s -- --skip-license
+fi
+
+. ~/.profile
+cd ukmm
+cargo build --release

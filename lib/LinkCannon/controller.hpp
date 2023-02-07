@@ -21,6 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <botw.hpp>
 
+#include <type_traits>
+
 
 enum class btn {
   A = 0x00000001,
@@ -52,7 +54,16 @@ enum class btn {
   R_RIGHT = 0x08000000
 };
 
-auto getController = controllerMgr->getController;
+typedef std::underlying_type_t<btn> btnType;
 
 
-auto holdingOnly(auto controller, auto buttons);
+inline btn operator|(auto lhs, auto rhs) noexcept {
+  return static_cast<btn>(
+    static_cast<btnType>(lhs) | static_cast<btnType>(rhs)
+  );
+}
+
+
+inline auto holdingOnly(auto controller, auto buttons) noexcept {
+  return controller->isHoldAll(buttons) && !controller->isHold(~buttons);
+}

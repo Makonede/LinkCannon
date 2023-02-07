@@ -24,13 +24,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
-constexpr auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
+const auto BUTTON_COMBO = static_cast<btnType>(btn::ZR | btn::UP | btn::R3);
 
 
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
-[[noreturn]] auto _main([[maybe_unused]] auto unused) {
-  auto controller = getController(0);
+[[noreturn]] auto _main([[maybe_unused]] auto unused) noexcept {
+  auto controller = controllerMgr->getController(0);
   sead::SafeString eventName("LinkCannon");
 
   while (true) [[likely]] {
@@ -44,7 +44,7 @@ constexpr auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
 
 
 // Initialization function (entrypoint)
-extern "C" auto init() {
+extern "C" auto init() noexcept {
   static nn::os::ThreadType mainThread;
 
   // Allocate memory for the main thread stack
@@ -74,4 +74,4 @@ extern "C" auto init() {
 
 
 // Finalization function
-extern "C" auto fini() {}
+extern "C" auto fini() noexcept {}

@@ -27,6 +27,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 extern bool callEvent(
   void *, sead::SafeString *, sead::SafeString *, sead::Matrix34<float> *, bool,
   bool
-);
+) noexcept;
 
 extern sead::ControllerMgr *controllerMgr;
