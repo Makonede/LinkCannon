@@ -22,7 +22,7 @@ To update the mod, simply uninstall the mod with the instructions below and then
 
 ## Uninstallation
 > **Warning**
-> If you are using Link Cannon with other mods, this step will likely remove all of your other Breath of the Wild mods.
+> If you are using Link Cannon with other mods, this step will remove all of your other Breath of the Wild mods.
 
 To uninstall Link Cannon, delete the folder `/atmosphere/contents/01007EF00011E000` from your microSD card.
 
