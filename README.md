@@ -1,3 +1,6 @@
+> **Warning**
+> **THIS MOD IS NOT CURRENTLY FUNCTIONAL. INSTALL AT YOUR OWN RISK.**
+
 # Link Cannon
 <picture>
   <img alt="BTB" src="https://repository-images.githubusercontent.com/594929966/db09df55-f0ea-40e7-bd3e-dc1a84c60455">
