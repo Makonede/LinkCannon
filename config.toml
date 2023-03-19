@@ -20,4 +20,4 @@ output = "config/symbols.ld"
 elf = "build/linkcannon.elf"
 nso = "build/linkcannon.nso"
 make_args = ["-j8", "-C", "build", "-f", "../Makefile"]
-ignored_symbols = [".text", ".data", "__register_frame_info", "__deregister_frame_info", "_ZN4ksys3evt8MetadataC1EPKcS3_S3_", "_ZN4ksys3evt8MetadataD1Ev"]
+ignored_symbols = [".text", ".data", "__register_frame_info", "__deregister_frame_info"]
