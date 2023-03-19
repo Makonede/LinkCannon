@@ -71,12 +71,15 @@ the given instructions.
 
 - devkitPro [`switch-dev`](https://switchbrew.org/wiki/Setting_up_Development_Environment)
 (devkitA64 and libnx)
-- [Python] 3.6+
+- [Python] 3.11+
 
 ### Steps
 
 1. Clone the repository.
-2. To build on UNIX:
+2. Create a directory in the repository called `dump`, and inside `dump`, one called
+`Pack`.
+3. Plac your dump of `Bootup_USen.pack` in `dump/Pack`.
+4. To build on UNIX:
 
 - Open a shell.
 - `cd` into the repository directory.
