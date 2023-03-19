@@ -75,7 +75,7 @@ the given instructions.
 
 ### Steps
 
-1. Clone the repository.
+1. Clone the repository recursively.
 2. Create a directory in the repository called `dump`, and inside `dump`, one called
 `Pack`.
 3. Plac your dump of `Bootup_USen.pack` in `dump/Pack`.
