@@ -4,9 +4,6 @@
 [submodule "lib/nnheaders"]
 	path = lib/nnheaders
 	url = https://github.com/open-ead/nnheaders
-[submodule "ukmm/ukmm"]
-	path = ukmm/ukmm
-	url = https://github.com/NiceneNerd/ukmm
 [submodule "tools/botw-link"]
 	path = tools/botw-link
 	url = https://github.com/Makonede/botw-link
