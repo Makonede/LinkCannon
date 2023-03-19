@@ -33,7 +33,7 @@ LDSCRIPT := $(CONFIG_DIR)/symbols.ld
 LINKER_VERSION_SCRIPT := $(CONFIG_DIR)/exported
 SWITCH_SPECS := $(CONFIG_DIR)/switch.specs
 CFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.c)))
-CPPFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.cpp)))
+CPPFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.cpp))) $(LIB_DIR)/botw/src/KingSystem/Event/evtMetadata.cpp
 SFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.s)))
 OFILES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 DFILES := $(OFILES:.o=.d)
