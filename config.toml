@@ -1,0 +1,23 @@
+# config.toml - botw-link configuration file.
+# Copyright (C) 2023  Makonede
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+linker_config_dir = "config"
+output = "config/symbols.ld"
+elf = "build/linkcannon.elf"
+nso = "build/linkcannon.nso"
+make_args = ["-j8", "-C", "build", "-f", "../Makefile"]
+ignored_symbols = [".text", ".data", "__register_frame_info", "__deregister_frame_info", "_ZN4ksys3evt8MetadataC1EPKcS3_S3_", "_ZN4ksys3evt8MetadataD1Ev"]

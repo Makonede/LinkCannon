@@ -21,10 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <botw.hpp>
 
-#include <type_traits>
 
-
-enum class btn {
+enum class btn : unsigned int {
   A = 0x00000001,
   B = 0x00000002,
   ZL = 0x00000004,
@@ -54,16 +52,18 @@ enum class btn {
   R_RIGHT = 0x08000000
 };
 
-typedef std::underlying_type_t<btn> btnType;
 
-
-inline btn operator|(auto lhs, auto rhs) noexcept {
+inline btn operator|(btn lhs, btn rhs) noexcept {
   return static_cast<btn>(
-    static_cast<btnType>(lhs) | static_cast<btnType>(rhs)
+    static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs)
   );
 }
 
 
-inline auto holdingOnly(auto controller, auto buttons) noexcept {
-  return controller->isHoldAll(buttons) && !controller->isHold(~buttons);
+inline auto holdingOnly(sead::Controller *controller, btn buttons) noexcept {
+  return controller->isHoldAll(
+    static_cast<unsigned int>(buttons)
+  ) && !controller->isHold(
+    ~static_cast<unsigned int>(buttons)
+  );
 }

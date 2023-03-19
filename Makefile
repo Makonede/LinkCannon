@@ -27,7 +27,7 @@ SOURCE_DIR := $(ROOT_DIR)/src/
 CONFIG_DIR := $(ROOT_DIR)/config
 ALL_SOURCES_DIRS := $(shell find $(SOURCE_DIR) -type d)
 LIBDIRS := $(PORTLIBS) $(LIBNX)
-ALL_INCLUDE_DIRS := $(SOURCE_DIR) $(LIB_DIR)/nnheaders/include $(LIB_DIR)/sead/include $(LIB_DIR)/LinkCannon
+ALL_INCLUDE_DIRS := $(SOURCE_DIR) $(LIB_DIR)/nnheaders/include $(LIB_DIR)/sead/include $(LIB_DIR)/botw/src $(LIB_DIR)/LinkCannon
 VPATH := $(foreach dir,$(ALL_SOURCES_DIRS),$(CURDIR)/$(dir))
 LDSCRIPT := $(CONFIG_DIR)/symbols.ld
 LINKER_VERSION_SCRIPT := $(CONFIG_DIR)/exported
@@ -42,7 +42,7 @@ LD := $(CXX)
 INCLUDE := $(foreach dir,$(ALL_INCLUDE_DIRS),-I$(CURDIR)/$(dir)) $(foreach dir,$(LIBDIRS),-I$(dir)/include)
 DEFINES := -D__SWITCH__ -DSWITCH -DNNSDK $(EXTRA_DEFINES)
 ARCH := -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
-CFLAGS := -g -Wall -ffunction-sections -O3 $(ARCH) $(DEFINES) $(INCLUDE)
+CFLAGS := -g -Wall -ffunction-sections -O3 $(ARCH) $(DEFINES) $(INCLUDE) $(BOTW_VERSION_DEFINES)
 CXXFLAGS := $(CFLAGS) -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive -std=c++2a
 ASFLAGS := -g $(ARCH)
 LDFLAGS := -specs=$(SWITCH_SPECS) -g $(ARCH) -Wl,-Map,$(TARGET).map -Wl,--version-script=$(LINKER_VERSION_SCRIPT) -Wl,-init=init -Wl,-fini=fini -Wl,--export-dynamic -nodefaultlibs

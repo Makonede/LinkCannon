@@ -1,3 +1,8 @@
 .vs/
+.vscode/
 build/
 release/
+dump/
+patched/
+config/160.yaml
+config/symbols.ld

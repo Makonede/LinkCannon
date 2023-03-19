@@ -1,4 +1,10 @@
-blank = 0;
-_Z9callEventPvPN4sead14SafeStringBaseIcEES3_PNS0_8Matrix34IfEEbb = 0xfb0930 - 0x3483000;
-_Z11triggerAddr = 0x2d562f0 - 0x3483000;
-_Z13controllerMgr = 0x2cbf658 - 0x3483000;
+
+/*
+ * This linker script is generated from config files in config/linker
+ * CHANGES WILL BE LOST
+ */
+
+
+_ZN4ksys3evt7Manager11doCallEventERKNS0_8MetadataEPi = 0x015E59E0 - 0x3483000;
+_ZN4sead13ControllerMgr9sInstanceE = 0x02CBF658 - 0x3483000;
+_ZN4ksys3evt7Manager9sInstanceE = 0x02CC56D8 - 0x3483000;

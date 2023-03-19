@@ -16,22 +16,28 @@ rem
 rem  You should have received a copy of the GNU General Public License
 rem  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 echo on
+
 
 set VERSION=0.1
 set TID=01007EF00011E000
 set RELEASE_PATH=release\atmosphere\contents\%TID%
 
-make -C build -f ..\Makefile || exit /b
+py -m pip install -U pip || exit /b
+py -m pip install -U setuptools wheel || exit /b
+py -m pip install -Ur tools\botw-link\requirements.txt || exit /b
+py -m pip install -U python-ips || exit /b
+py -3 tools\botw-link config.toml -vV 160 || exit /b
+make -j8 -C build -f ..\Makefile || exit /b
 rd /s /q release || exit /b
 md %RELEASE_PATH%\exefs || exit /b
 md %RELEASE_PATH%\romfs\System || exit /b
-echo | set /p _=1.6.0-LC%VERSION% > %RELEASE_PATH%\romfs\System\Version.txt || exit /b
-set _=
+echo | set /p _=1.6.0-LC%VERSION% > %RELEASE_PATH%\romfs\System\Version.txt || cmd /c "exit /b 0"
 copy build\linkcannon.nso %RELEASE_PATH%\exefs\subsdk9 || exit /b
 copy build\app.npdm %RELEASE_PATH%\exefs\main.npdm || exit /b
-robocopy romfs %RELEASE_PATH%\romfs /e /mt
+robocopy romfs %RELEASE_PATH%\romfs /e /mt || if errorlevel 8 exit /b else cmd /c "exit /b 0"
+py -3 patch.py || exit /b
+robocopy patched %RELEASE_PATH%\romfs /e /mt || if errorlevel 8 exit /b else cmd /c "exit /b 0"
 
 @echo off
 echo. || exit /b

@@ -1,6 +1,7 @@
-#!/usr/bin/env -S bash -Eeuxo pipefail
+#!/usr/bin/env python3
+# -*- coding: utf_8 -*-
 
-# deploy - UKMM autodeploy Bash script for UNIX.
+# patch.py - IPS patching Python script.
 # Copyright (C) 2023  Makonede
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,16 +18,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-CMAKE_VERSION=3.25.2
+import ips
 
-if ! hash rustc 2> /dev/null; then
-  curl -fSs https://sh.rustup.rs | sh -s -- -y --default-host x86_64-unknown-linux-gnu --default-toolchain nightly --profile complete
-fi
+from pathlib import Path
+from shutil import copytree
 
-if ! hash cmake 2> /dev/null; then
-  curl -fLSs https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-linux-x86_64.sh | sh -s -- --skip-license
-fi
 
-. ~/.profile
-cd ukmm
-cargo build --release
+def list_files(path: Path) -> list[Path]:
+    return [p for p in path.rglob('*') if p.is_file()]
+
+
+def main() -> None:
+    copytree('dump', 'patched')
+    dumped_files: list[Path] = list_files(Path('patched'))
+
+    for file in dumped_files:
+        ips.apply(f'{Path("patches", *file.parts[1:])}.ips', f'{file}')
+
+
+if __name__ == '__main__':
+    main()

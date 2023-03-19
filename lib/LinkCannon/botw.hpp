@@ -1,5 +1,5 @@
 /*
-botw.hpp - Header file for used functions and variables from Breath of the Wild.
+botw.hpp - Header file for used headers from Breath of the Wild.
 Copyright (C) 2023  Makonede
 
 This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <KingSystem/Event/evtManager.h>
+#include <KingSystem/Event/evtMetadata.h>
+
 #include <controller/seadControllerMgr.h>
-#include <math/seadMatrix.hpp>
-#include <prim/seadSafeString.hpp>
-
-
-extern bool callEvent(
-  void *, sead::SafeString *, sead::SafeString *, sead::Matrix34<float> *, bool,
-  bool
-) noexcept;
-
-extern sead::ControllerMgr *controllerMgr;
