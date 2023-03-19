@@ -49,10 +49,15 @@ from your microSD card.
 ## Usage
 
 Once the mod is installed, it will automatically load when starting the game. To
-launch Breath of the Wild with Link Cannon temporarily disabled, hold ![L](https://restite.org/dpad/l)
+launch Breath of the Wild with Link Cannon temporarily disabled, hold
+<picture>
+  <img alt="L" src="https://restite.org/dpad/l">
+</picture>
 after selecting a user.
 
-![ZR, D-pad Up and Right Stick](https://restite.org/dpad/R8o)
+<picture>
+  <img alt="ZR, D-pad Up and Right Stick" src="https://restite.org/dpad/R8o">
+</picture>
 
 This button combination will open the BTB simulation dialog — from there, just follow
 the given instructions.
