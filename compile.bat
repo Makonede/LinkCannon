@@ -24,7 +24,8 @@ set TID=01007EF00011E000
 set RELEASE_PATH=release\atmosphere\contents\%TID%
 
 py -m pip install -U pip || exit /b
-py -m pip install -U setuptools wheel || exit /b
+py -m pip install -U setuptools || exit /b
+py -m pip install -U wheel || exit /b
 py -m pip install -Ur tools\botw-link\requirements.txt || exit /b
 py -m pip install -U python-ips || exit /b
 py -3 tools\botw-link config.toml -vV 160 || exit /b
