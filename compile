@@ -22,7 +22,8 @@ TID=01007EF00011E000
 RELEASE_PATH=release/atmosphere/contents/$TID
 
 python3 -m pip install -U pip
-python3 -m pip install -U setuptools wheel
+python3 -m pip install -U setuptools
+python3 -m pip install -U wheel
 python3 -m pip install -Ur tools/botw-link/requirements.txt
 python3 -m pip install -U python-ips
 python3 tools/botw-link config.toml -V 160
