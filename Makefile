@@ -27,13 +27,15 @@ SOURCE_DIR := $(ROOT_DIR)/src/
 CONFIG_DIR := $(ROOT_DIR)/config
 ALL_SOURCES_DIRS := $(shell find $(SOURCE_DIR) -type d)
 LIBDIRS := $(PORTLIBS) $(LIBNX)
-ALL_INCLUDE_DIRS := $(SOURCE_DIR) $(LIB_DIR)/nnheaders/include $(LIB_DIR)/sead/include $(LIB_DIR)/botw/src $(LIB_DIR)/LinkCannon
+ALL_INCLUDE_DIRS := $(SOURCE_DIR) $(LIB_DIR)/nnheaders/include $(LIB_DIR)/sead/include $(LIB_DIR)/botw/src $(LIB_DIR)/LinkCannon $(LIB_DIR)/botw/lib/agl/include
 VPATH := $(foreach dir,$(ALL_SOURCES_DIRS),$(CURDIR)/$(dir))
 LDSCRIPT := $(CONFIG_DIR)/symbols.ld
 LINKER_VERSION_SCRIPT := $(CONFIG_DIR)/exported
 SWITCH_SPECS := $(CONFIG_DIR)/switch.specs
+BOTW_DIR=$(LIB_DIR)/botw/src
+SEAD_DIR=$(LIB_DIR)/sead/modules/src
 CFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.c)))
-CPPFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.cpp))) $(LIB_DIR)/botw/src/KingSystem/Event/evtMetadata.cpp
+CPPFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.cpp))) $(BOTW_DIR)/KingSystem/Event/evtMetadata.cpp $(SEAD_DIR)/prim/seadSafeString.cpp $(BOTW_DIR)/KingSystem/Event/evtOrderParam.cpp $(BOTW_DIR)/KingSystem/ActorSystem/actBaseProcLink.cpp $(SEAD_DIR)/basis/seadNew.cpp $(SEAD_DIR)/heap/seadHeapMgr.cpp $(SEAD_DIR)/heap/seadArena.cpp $(SEAD_DIR)/thread/nin/seadCriticalSectionNin.cpp $(SEAD_DIR)/container/seadPtrArray.cpp $(SEAD_DIR)/heap/seadDisposer.cpp $(SEAD_DIR)/heap/seadHeap.cpp $(SEAD_DIR)/container/seadListImpl.cpp
 SFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.s)))
 OFILES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 DFILES := $(OFILES:.o=.d)

@@ -31,6 +31,7 @@ py -m pip install -U python-ips || exit /b
 py -3 tools\botw-link config.toml -vV 160 || exit /b
 make -j8 -C build -f ..\Makefile || exit /b
 rd /s /q release || exit /b
+rd /s /q patched || exit /b
 md %RELEASE_PATH%\exefs || exit /b
 md %RELEASE_PATH%\romfs\System || exit /b
 echo | set /p _=1.6.0-LC%VERSION% > %RELEASE_PATH%\romfs\System\Version.txt || cmd /c "exit /b 0"

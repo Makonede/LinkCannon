@@ -29,6 +29,7 @@ python3 -m pip install -U python-ips
 python3 tools/botw-link config.toml -vV 160
 make -j8 -C build -f ../Makefile
 rm -rf release/
+rm -rf patched/
 mkdir -p $RELEASE_PATH/exefs
 mkdir -p $RELEASE_PATH/romfs/System
 echo -n 1.6.0-LC$VERSION > $RELEASE_PATH/romfs/System/Version.txt
