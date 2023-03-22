@@ -1,6 +1,7 @@
 {
     global:
-        main;
-        
+        init;
+        fini;
+
     local: *;
 };  
