@@ -28,7 +28,7 @@ py -m pip install -U setuptools || exit /b
 py -m pip install -U wheel || exit /b
 py -m pip install -Ur tools\botw-link\requirements.txt || exit /b
 py -m pip install -U python-ips || exit /b
-py -3 tools\botw-link config.toml -vV 160 || exit /b
+py -3 tools\botw-link config.toml -cvV 160 || exit /b
 make -j8 -C build -f ..\Makefile || exit /b
 rd /s /q release || exit /b
 rd /s /q patched || exit /b
