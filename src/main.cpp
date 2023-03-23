@@ -59,7 +59,7 @@ std::mutex combo_mutex;
 
 
 // Initialization function (entrypoint)
-extern "C" auto init() noexcept {
+extern "C" auto linkcannon_init() noexcept {
   static nn::os::ThreadType mainThread;
 
   // Allocate memory for the main thread stack
@@ -89,4 +89,4 @@ extern "C" auto init() noexcept {
 
 
 // Finalization function
-extern "C" auto fini() noexcept {}
+extern "C" auto linkcannon_fini() noexcept {}
