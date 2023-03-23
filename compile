@@ -17,7 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-VERSION=0.1
 TID=01007EF00011E000
 RELEASE_PATH=release/atmosphere/contents/$TID
 
@@ -31,8 +30,6 @@ make -j8 -C build -f ../Makefile
 rm -rf release/
 rm -rf patched/
 mkdir -p $RELEASE_PATH/exefs
-mkdir -p $RELEASE_PATH/romfs/System
-echo -n 1.6.0-LC$VERSION > $RELEASE_PATH/romfs/System/Version.txt
 cp -Rf build/linkcannon.nso $RELEASE_PATH/exefs/subsdk9
 cp -Rf build/app.npdm $RELEASE_PATH/exefs/main.npdm
 cp -Rf romfs/ $RELEASE_PATH/
