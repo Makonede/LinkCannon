@@ -33,8 +33,7 @@ make -j8 -C build -f ..\Makefile || exit /b
 rd /s /q release || exit /b
 rd /s /q patched || exit /b
 md %RELEASE_PATH%\exefs || exit /b
-md %RELEASE_PATH%\romfs\System || exit /b
-echo | set /p _=1.6.0-LC%VERSION% > %RELEASE_PATH%\romfs\System\Version.txt || cmd /c "exit /b 0"
+md %RELEASE_PATH%\romfs || exit /b
 copy build\linkcannon.nso %RELEASE_PATH%\exefs\subsdk9 || exit /b
 copy build\app.npdm %RELEASE_PATH%\exefs\main.npdm || exit /b
 robocopy romfs %RELEASE_PATH%\romfs /e /mt || if errorlevel 8 exit /b else cmd /c "exit /b 0"
