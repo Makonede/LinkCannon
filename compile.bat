@@ -19,7 +19,6 @@ rem  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 echo on
 
 
-set VERSION=0.1
 set TID=01007EF00011E000
 set RELEASE_PATH=release\atmosphere\contents\%TID%
 
