@@ -29,5 +29,5 @@ struct ModuleName {
 };
 
 
-__attribute__((section(".rodata.module_name")))
-const ModuleName module_name = {.unknown = 0, .name_length = MODULE_NAME_LEN, .name = MODULE_NAME};
+__attribute__((section(".nx-module-name")))
+const ModuleName s_ModuleName = {.unknown = 0, .name_length = MODULE_NAME_LEN, .name = MODULE_NAME};

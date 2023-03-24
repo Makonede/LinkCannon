@@ -31,7 +31,7 @@ SECTIONS
   . = ALIGN(0x1000);
 
   /* App name */
-  .module_name : { KEEP (*(.rodata.module_name)) } :rodata
+  .module_name : { KEEP (*(.nx-module-name)) } :rodata
 
   /* Make sure everything is aligned */
   . = ALIGN(8);
