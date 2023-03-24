@@ -18,8 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 .section ".text.crt0","ax"
-
 .global __module_start
+.extern __nx_module_runtime
+
 __module_start:
     .word 0x00000000
     .word __nx_mod0 - __module_start
@@ -27,7 +28,7 @@ __module_start:
     .align 4
 
 .section ".rodata.mod0","a"
-.hidden exl_nx_module_runtime 
+.hidden __nx_module_runtime 
 
 .align 2
 __nx_mod0:
@@ -37,4 +38,4 @@ __nx_mod0:
     .word  __bss_end__              - __nx_mod0
     .word  __eh_frame_hdr_start__   - __nx_mod0
     .word  __eh_frame_hdr_end__     - __nx_mod0
-    .word  exl_nx_module_runtime    - __nx_mod0
+    .word  __nx_module_runtime    - __nx_mod0

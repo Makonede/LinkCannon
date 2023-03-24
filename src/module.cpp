@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MODULE_NAME "Link Cannon"
 #define MODULE_NAME_LEN 11
 
+__attribute__((section(".bss"))) char __nx_module_runtime[0xD0];
 
 struct ModuleName {
   int unknown;
@@ -28,5 +29,5 @@ struct ModuleName {
 };
 
 
-__attribute__((section(".nx-module-name")))
-const ModuleName s_ModuleName = {.unknown = 0, .name_length = MODULE_NAME_LEN, .name = MODULE_NAME};
+__attribute__((section(".rodata.module_name")))
+const ModuleName module_name = {.unknown = 0, .name_length = MODULE_NAME_LEN, .name = MODULE_NAME};
