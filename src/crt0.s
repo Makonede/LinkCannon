@@ -28,7 +28,7 @@ __module_start:
     .align 4
 
 .section ".rodata.mod0","a"
-.hidden __nx_module_runtime 
+.global __nx_mod0
 
 .align 2
 __nx_mod0:
