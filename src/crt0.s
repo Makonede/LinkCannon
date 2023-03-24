@@ -17,14 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+.section ".text.crt0","ax"
+
 .global __module_start
 __module_start:
     .word 0x00000000
     .word __nx_mod0 - __module_start
 
     .align 4
-.section ".rodata.mod0","a"
 
+.section ".rodata.mod0","a"
 .hidden exl_nx_module_runtime 
 
 .align 2
