@@ -25,6 +25,8 @@ python3 -m pip install -U setuptools
 python3 -m pip install -U wheel
 python3 -m pip install -Ur tools/botw-link/requirements.txt
 python3 -m pip install -U python-ips
+rm -rf build/
+mkdir build/
 python3 tools/botw-link config.toml -cvV 160
 make -j8 -C build -f ../Makefile
 rm -rf release/

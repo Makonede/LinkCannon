@@ -17,8 +17,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#define MODULE_NAME "LinkCannon"
-#define MODULE_NAME_LEN 10
+#define MODULE_NAME "Link Cannon"
+#define MODULE_NAME_LEN 11
 
 
 struct ModuleName {
