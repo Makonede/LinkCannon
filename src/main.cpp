@@ -25,14 +25,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstdlib>
 
-#include <condition_variable>
-#include <mutex>
-
 
 const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
 auto *controller = sead::ControllerMgr::instance()->getController(0);
-std::condition_variable combo;
-std::mutex combo_mutex;
 
 
 // Main loop thread
@@ -40,20 +35,17 @@ std::mutex combo_mutex;
 [[noreturn]] auto _main([[maybe_unused]] auto *unused) noexcept {
   auto *eventManager = ksys::evt::Manager::instance();
   sead::SafeString eventName("LinkCannon");
-  std::unique_lock<std::mutex> lock(combo_mutex);
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed
-    combo.wait(lock, [&] {
-      return holdingOnly(controller, BUTTON_COMBO);
-    });
+    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {}
 
     eventManager->callEvent(ksys::evt::Metadata("LinkCannon"));
 
     // Wait until at least one of the buttons in the combination is released
-    combo.wait(lock, [&] {
-      return !controller->isHoldAll(static_cast<unsigned int>(BUTTON_COMBO));
-    });
+    while (controller->isHoldAll(
+      static_cast<unsigned int>(BUTTON_COMBO)
+    )) [[unlikely]] {}
   }
 }
 
