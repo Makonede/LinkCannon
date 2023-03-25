@@ -36,8 +36,7 @@ const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
   while (true) [[likely]] {
     // Wait until the button combination is pressed
     while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {
-      // Prevent this loop from being optimized away
-      asm("");
+      nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
     }
 
     eventManager->callEvent(ksys::evt::Metadata("LinkCannon"));
@@ -46,8 +45,7 @@ const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
     while (controller->isHoldAll(
       static_cast<unsigned int>(BUTTON_COMBO)
     )) [[unlikely]] {
-      // Prevent this loop from being optimized away
-      asm("");
+      nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
     }
   }
 }
