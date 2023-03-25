@@ -21,8 +21,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <nn/os.h>
 
-#include <prim/seadSafeString.hpp>
-
 #include <cstdlib>
 
 
@@ -34,7 +32,6 @@ auto *controller = sead::ControllerMgr::instance()->getController(0);
 // The function is named _main in order to not be treated as the main function.
 [[noreturn]] auto _main([[maybe_unused]] auto *unused) noexcept {
   auto *eventManager = ksys::evt::Manager::instance();
-  sead::SafeString eventName("LinkCannon");
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed

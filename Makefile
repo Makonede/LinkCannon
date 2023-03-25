@@ -35,7 +35,7 @@ SWITCH_SPECS := $(CONFIG_DIR)/switch.specs
 BOTW_DIR := $(LIB_DIR)/botw/src
 SEAD_DIR := $(LIB_DIR)/sead/modules/src
 CFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.c)))
-CPPFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.cpp))) $(BOTW_DIR)/KingSystem/Event/evtMetadata.cpp $(SEAD_DIR)/prim/seadSafeString.cpp $(BOTW_DIR)/KingSystem/Event/evtOrderParam.cpp $(BOTW_DIR)/KingSystem/ActorSystem/actBaseProcLink.cpp $(SEAD_DIR)/basis/seadNew.cpp $(SEAD_DIR)/heap/seadHeapMgr.cpp $(SEAD_DIR)/heap/seadArena.cpp $(SEAD_DIR)/thread/nin/seadCriticalSectionNin.cpp $(SEAD_DIR)/container/seadPtrArray.cpp $(SEAD_DIR)/heap/seadDisposer.cpp $(SEAD_DIR)/heap/seadHeap.cpp $(SEAD_DIR)/container/seadListImpl.cpp
+CPPFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES := $(foreach dir,$(ALL_SOURCES_DIRS),$(notdir $(wildcard $(dir)/*.s)))
 OFILES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 DFILES := $(OFILES:.o=.d)
