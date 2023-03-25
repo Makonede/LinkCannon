@@ -35,14 +35,20 @@ auto *controller = sead::ControllerMgr::instance()->getController(0);
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed
-    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {}
+    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {
+      // Prevent this loop from being optimized away
+      asm("");
+    }
 
     eventManager->callEvent(ksys::evt::Metadata("LinkCannon"));
 
     // Wait until at least one of the buttons in the combination is released
     while (controller->isHoldAll(
       static_cast<unsigned int>(BUTTON_COMBO)
-    )) [[unlikely]] {}
+    )) [[unlikely]] {
+      // Prevent this loop from being optimized away
+      asm("");
+    }
   }
 }
 
