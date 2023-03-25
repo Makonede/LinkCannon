@@ -25,13 +25,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
-auto *controller = sead::ControllerMgr::instance()->getController(0);
 
 
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
 [[noreturn]] auto _main([[maybe_unused]] auto *unused) noexcept {
   auto *eventManager = ksys::evt::Manager::instance();
+  auto *controller = sead::ControllerMgr::instance()->getController(0);
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed
