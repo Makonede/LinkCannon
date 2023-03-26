@@ -24,11 +24,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
-// Sleep for 1 μs
-// This prevents busy waiting while loops from being optimized away without
+// Yield the thread and sleep for 1 ds
+// This allows other threads to work and prevents busy waiting while loops from
 // eating CPU cycles.
-auto dont_optimize() noexcept {
-  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
+auto Yield() noexcept {
+  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(100000000ull));
 }
 
 
@@ -36,32 +36,40 @@ auto dont_optimize() noexcept {
 // The function is named _main in order to not be treated as the main function.
 auto _main([[maybe_unused]] auto *unused) noexcept {
   ksys::evt::Manager *eventManager;
-  do {
+  do [[unlikely]] {
     eventManager = ksys::evt::Manager::instance();
-  } while (eventManager == nullptr); [[unlikely]]
+    Yield();
+  } while (eventManager == nullptr);
 
   sead::ControllerMgr *controllerManager;
-  do {
+  do [[unlikely]] {
     controllerManager = sead::ControllerMgr::instance();
-  } while (controllerManager == nullptr); [[unlikely]]
+    Yield();
+  } while (controllerManager == nullptr);
 
   sead::Controller *controller;
-  do {
+  do [[unlikely]] {
     controller = controllerManager->getController(0);
-  } while (controller = nullptr); [[unlikely]]
+    Yield();
+  } while (controller == nullptr);
 
   const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
+  const auto EVENT_METADATA = ksys::evt::Metadata("LinkCannon");
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed
-    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {dont_optimize();}
+    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {
+      Yield();
+    }
 
-    eventManager->callEvent(ksys::evt::Metadata("LinkCannon"));
+    eventManager->callEvent(EVENT_METADATA);
 
     // Wait until at least one of the buttons in the combination is released
     while (controller->isHoldAll(
       static_cast<unsigned int>(BUTTON_COMBO)
-    )) [[unlikely]] {dont_optimize();}
+    )) [[unlikely]] {
+      Yield();
+    }
   }
 }
 
