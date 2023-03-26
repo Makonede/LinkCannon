@@ -24,40 +24,44 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
+// Sleep for 1 μs
+// This prevents busy waiting while loops from being optimized away without
+// eating CPU cycles.
+auto dont_optimize() noexcept {
+  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
+}
+
+
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
 auto _main([[maybe_unused]] auto *unused) noexcept {
-  auto *eventManager = ksys::evt::Manager::instance();
-  if (eventManager == nullptr) [[unlikely]] {
-    return;
-  }
+  ksys::evt::Manager *eventManager;
+  do {
+    eventManager = ksys::evt::Manager::instance();
+  } while (eventManager == nullptr); [[unlikely]]
 
-  auto *controllerManager = sead::ControllerMgr::instance();
-  if (controllerManager == nullptr) [[unlikely]] {
-    return;
-  }
+  sead::ControllerMgr *controllerManager;
+  do {
+    controllerManager = sead::ControllerMgr::instance();
+  } while (controllerManager == nullptr); [[unlikely]]
 
-  auto *controller = controllerManager->getController(0);
-  if (controller == nullptr) [[unlikely]] {
-    return;
-  }
+  sead::Controller *controller;
+  do {
+    controller = controllerManager->getController(0);
+  } while (controller = nullptr); [[unlikely]]
 
   const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed
-    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {
-      nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
-    }
+    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {dont_optimize();}
 
     eventManager->callEvent(ksys::evt::Metadata("LinkCannon"));
 
     // Wait until at least one of the buttons in the combination is released
     while (controller->isHoldAll(
       static_cast<unsigned int>(BUTTON_COMBO)
-    )) [[unlikely]] {
-      nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
-    }
+    )) [[unlikely]] {dont_optimize();}
   }
 }
 
