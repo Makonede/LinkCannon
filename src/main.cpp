@@ -42,7 +42,6 @@ auto _main([[maybe_unused]] auto *unused) noexcept {
     return;
   }
 
-  if (
   const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
 
   while (true) [[likely]] {
