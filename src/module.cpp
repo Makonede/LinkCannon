@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MODULE_NAME "Link Cannon"
 #define MODULE_NAME_LEN 11
 
-__attribute__((section(".bss"))) char __nx_module_runtime[0xD0];
+__attribute__((section(".bss"))) char __nx_module_runtime[0xd0ull];
 
 struct ModuleName {
   int unknown;
