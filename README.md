@@ -13,7 +13,7 @@ help with BTB setups.
 
 - A homebrewed Nintendo Switch running [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere)
 - [Python] 3.11+
-- A dump of `Pack/Bootup_USen.pack` and `System/Resource/ResourceSizeTable.product.srsizetable`
+- A dump of `Pack/Bootup.pack`, `Pack/Bootup_USen.pack`, and `System/Resource/ResourceSizeTable.product.srsizetable`
 from Breath of the Wild 1.6.0
 
 To install Link Cannon:
@@ -21,10 +21,10 @@ To install Link Cannon:
 - Download the [latest release](https://github.com/Makonede/LinkCannon/releases/latest)'s
 `.zip` file (alternatively, the `.tar.xz` file if on UNIX) and extract it to your
 PC.
-- Place your dump of `Bootup_USen.pack` in the `dump/Pack` folder in the folder that
-you extracted the `.zip` (or `.tar.xz`) to — the folder also containing `patch.py`,
-`patches`, and `content`. Place your dump of `ResourceSizeTable.product.srsizetable`
-in `dump/System/Resource`.
+- Place your dumps of `Bootup.pack` and `Bootup_USen.pack` in the `dump/Pack` folder
+in the folder that you extracted the `.zip` (or `.tar.xz`) to — the folder also
+containing `patch.py`, `patches`, and `content`. Place your dump of
+`ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
 - Run `patch.py`.
 - Extract the resulting `patched.zip` (or `patched.tar.xz`) file to the root of your
 microSD card.
@@ -79,8 +79,8 @@ the given instructions.
 1. Clone the repository recursively.
 2. Create a directory in the repository called `dump`, and inside `dump`, one called
 `Pack` and one called `System`. Inside `System`, also create a folder called `Resource`.
-3. Plac your dump of `Bootup_USen.pack` in `dump/Pack` and your dump of `ResourceSizeTable.product.srsizetable`
-in `dump/System/Resource`.
+3. Plac your dumps of `Bootup.pack` and `Bootup_USen.pack` in `dump/Pack` and your
+dump of `ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
 4. To build on UNIX:
 
 - Open a shell.
