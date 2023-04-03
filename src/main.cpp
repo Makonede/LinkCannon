@@ -53,7 +53,7 @@ auto _main([[maybe_unused]] auto *unused) noexcept {
     Yield();
   } while (controller == nullptr);
 
-  const auto BUTTON_COMBO = btn::ZR | btn::UP | btn::R3;
+  const auto BUTTON_COMBO = btn::ZL | btn::ZR | btn::A;
   const auto EVENT_METADATA = ksys::evt::Metadata("LinkCannon");
 
   while (true) [[likely]] {
