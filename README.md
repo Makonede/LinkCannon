@@ -66,9 +66,6 @@ after selecting a user.
 This button combination will open the BTB simulation dialog — from there, just follow
 the given instructions.
 
-> **Note**
-> The button combination will not work if any other buttons are pressed.
-
 ## Building from source
 
 ### Prerequisites

@@ -56,12 +56,3 @@ inline btn operator|(btn lhs, btn rhs) noexcept {
     static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs)
   );
 }
-
-
-inline auto holdingOnly(sead::Controller *controller, btn buttons) noexcept {
-  return controller->isHoldAll(
-    static_cast<unsigned int>(buttons)
-  ) && !controller->isHold(
-    ~static_cast<unsigned int>(buttons)
-  );
-}

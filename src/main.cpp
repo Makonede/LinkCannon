@@ -58,7 +58,9 @@ auto _main([[maybe_unused]] auto *unused) noexcept {
 
   while (true) [[likely]] {
     // Wait until the button combination is pressed
-    while (!holdingOnly(controller, BUTTON_COMBO)) [[likely]] {
+    while (!controller->isHoldAll(
+      static_cast<unsigned int>(BUTTON_COMBO)
+    )) [[likely]] {
       Yield();
     }
 
