@@ -26,7 +26,7 @@ py -m pip install -U pip || exit /b
 py -m pip install -U setuptools || exit /b
 py -m pip install -U wheel || exit /b
 py -m pip install -Ur tools\botw-link\requirements.txt || exit /b
-py -m pip install -U python-ips || exit /b
+py -m pip install -U vidua || exit /b
 if exist build rd /s /q build || exit /b
 md build || exit /b
 py -3 tools\botw-link config.toml -cvV 160 || exit /b

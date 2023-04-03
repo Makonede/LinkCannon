@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf_8 -*-
 
-# patch.py - IPS patching Python script.
+# patch.py - BPS patching Python script.
 # Copyright (C) 2023  Makonede
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import ips
+from vidua import bps
 
 from pathlib import Path
 from shutil import copytree
@@ -30,10 +30,14 @@ def list_files(path: Path) -> list[Path]:
 
 def main() -> None:
     copytree('dump', 'patched')
-    dumped_files: list[Path] = list_files(Path('patched'))
+    dumped_files: list[Path] = list_files(Path('dump'))
 
     for file in dumped_files:
-        ips.apply(f'{Path("patches", *file.parts[1:])}.ips', f'{file}')
+        with open(file, 'rb') as dump, open(
+            f'{Path("patches", *file.parts[1:])}.bps', 'rb'
+        ) as patch, open(Path('patched', *file.parts[1:]), 'wb') as patched:
+            patched.write(bps.patch(dump, patch).read())
+            print(f'Patched {Path(*file.parts[1:])}')
 
 
 if __name__ == '__main__':

@@ -60,7 +60,7 @@ launch Breath of the Wild with Link Cannon temporarily disabled, hold
 after selecting a user.
 
 <picture>
-  <img alt="ZL, ZR, and A" src="https://restite.org/dpad/LRa">
+  <img alt="R, ZR, and Y" src="https://restite.org/dpad/rRy">
 </picture>
 
 This button combination will open the BTB simulation dialog — from there, just follow
