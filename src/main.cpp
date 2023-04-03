@@ -24,11 +24,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
-// Yield the thread and sleep for 1 ds
+// Yield the thread and sleep for 1 μs
 // This allows other threads to work and prevents busy waiting while loops from
 // eating CPU cycles.
 auto Yield() noexcept {
-  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(100000000ull));
+  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
 }
 
 
