@@ -32,7 +32,7 @@ make -j8 -C build -f ../Makefile
 rm -rf release/
 rm -rf patched/
 mkdir -p $RELEASE_PATH/exefs
-cp -Rf build/linkcannon.nso $RELEASE_PATH/exefs/subsdk9
+cp -Rf build/LinkCannon.nso $RELEASE_PATH/exefs/subsdk9
 cp -Rf build/app.npdm $RELEASE_PATH/exefs/main.npdm
 cp -Rf romfs/ $RELEASE_PATH/
 python3 patch.py

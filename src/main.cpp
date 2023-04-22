@@ -77,7 +77,7 @@ auto _main([[maybe_unused]] auto *unused) noexcept {
 
 
 // Initialization function (entrypoint)
-extern "C" auto linkcannon_init() noexcept {
+extern "C" auto LinkCannon_init() noexcept {
   static nn::os::ThreadType mainThread;
 
   // Allocate memory for the main thread stack
@@ -107,4 +107,4 @@ extern "C" auto linkcannon_init() noexcept {
 
 
 // Finalization function
-extern "C" auto linkcannon_fini() noexcept {}
+extern "C" auto LinkCannon_fini() noexcept {}
