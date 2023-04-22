@@ -35,19 +35,19 @@ auto Yield() noexcept {
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
 auto _main([[maybe_unused]] auto *unused) noexcept {
-  ksys::evt::Manager *eventManager;
+  ksys::evt::Manager *eventManager = nullptr;
   do [[unlikely]] {
     eventManager = ksys::evt::Manager::instance();
     Yield();
   } while (eventManager == nullptr);
 
-  sead::ControllerMgr *controllerManager;
+  sead::ControllerMgr *controllerManager = nullptr;
   do [[unlikely]] {
     controllerManager = sead::ControllerMgr::instance();
     Yield();
   } while (controllerManager == nullptr);
 
-  sead::Controller *controller;
+  sead::Controller *controller = nullptr;
   do [[unlikely]] {
     controller = controllerManager->getController(0);
     Yield();
