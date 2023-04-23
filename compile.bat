@@ -30,7 +30,7 @@ py -m pip install -U vidua || exit /b
 if exist build rd /s /q build || exit /b
 md build || exit /b
 py -3 tools\botw-link config.toml -cvV 160 || exit /b
-make -j8 -C build -f ..\Makefile || exit /b
+make -j%NUMBER_OF_PROCESSORS% -C build -f ..\Makefile || exit /b
 if exist release rd /s /q release || exit /b
 if exist patched rd /s /q patched || exit /b
 md %RELEASE_PATH%\exefs || exit /b

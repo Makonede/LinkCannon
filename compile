@@ -28,7 +28,13 @@ python3 -m pip install -U vidua
 rm -rf build/
 mkdir build/
 python3 tools/botw-link config.toml -cvV 160
-make -j8 -C build -f ../Makefile
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  make -j`sysctl -n hw.logicalcpu` -C build -f ../Makefile
+else
+  make -j`nproc` -C build -f ../Makefile
+fi
+
 rm -rf release/
 rm -rf patched/
 mkdir -p $RELEASE_PATH/exefs
