@@ -29,6 +29,4 @@ struct ModuleName {
 
 
 __attribute__((section(".nx-module-name")))
-const ModuleName s_ModuleName{};
-s_ModuleName.nameSize = MODULE_NAME_SIZE;
-s_ModuleName.name = MODULE_NAME;
+const ModuleName s_ModuleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE), .name = MODULE_NAME};
