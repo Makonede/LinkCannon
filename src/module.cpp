@@ -17,17 +17,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#define MODULE_NAME "Link Cannon"
-#define MODULE_NAME_LEN 11
+constexpr char MODULE_NAME[] = "Link Cannon";
+constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
 
-__attribute__((section(".bss"))) char __nx_module_runtime[0xd0ull];
-
+__attribute__((section(".bss"))) char __nx_module_runtime[0xd0uz];
 struct ModuleName {
-  int unknown;
-  int name_length;
-  char name[MODULE_NAME_LEN + 1];
+  [[maybe_unused]] int unused;
+  int nameSize;
+  char name[MODULE_NAME_SIZE];
 };
 
 
 __attribute__((section(".nx-module-name")))
-const ModuleName s_ModuleName = {.unknown = 0, .name_length = MODULE_NAME_LEN, .name = MODULE_NAME};
+const ModuleName s_ModuleName{};
+s_ModuleName.nameSize = MODULE_NAME_SIZE;
+s_ModuleName.name = MODULE_NAME;
