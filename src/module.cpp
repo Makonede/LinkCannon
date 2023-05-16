@@ -17,8 +17,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+#include <string>
+#include <utility>
+
 constexpr char MODULE_NAME[] = "Link Cannon";
 constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
+[[assume(std::in_range<int>(MODULE_NAME_SIZE))]];
 
 __attribute__((section(".bss"))) char __nx_module_runtime[0xd0uz];
 struct ModuleName {
@@ -29,4 +33,5 @@ struct ModuleName {
 
 
 __attribute__((section(".nx-module-name")))
-const ModuleName s_ModuleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE), .name = MODULE_NAME};
+const ModuleName s_ModuleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE)};
+strncpy_s(s_ModuleName.name, MODULE_NAME_SIZE, MODULE_NAME, MODULE_NAME_SIZE);
