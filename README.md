@@ -70,6 +70,8 @@ the given instructions.
 
 ### Prerequisites
 
+- Windows 7+, Linux, or macOS — `x86_64` architecture
+  - On Windows, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is also required
 - devkitPro [`switch-dev`](https://switchbrew.org/wiki/Setting_up_Development_Environment)
 (devkitA64 and libnx)
 - [Python] 3.11+
