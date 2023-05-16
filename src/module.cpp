@@ -17,8 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#include <string>
 #include <utility>
+
+#include <cstring>
 
 constexpr char MODULE_NAME[] = "Link Cannon";
 constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
@@ -34,4 +35,4 @@ struct ModuleName {
 
 __attribute__((section(".nx-module-name")))
 const ModuleName s_ModuleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE)};
-strncpy_s(s_ModuleName.name, MODULE_NAME_SIZE, MODULE_NAME, MODULE_NAME_SIZE);
+std::strncpy(s_ModuleName.name, MODULE_NAME, MODULE_NAME_SIZE);
