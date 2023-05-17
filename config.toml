@@ -19,5 +19,5 @@ linker_config_dir = "config"
 output = "config/symbols.ld"
 elf = "build/LinkCannon.elf"
 nso = "build/LinkCannon.nso"
-make_args = ["-j8", "-C", "build", "-f", "../Makefile"]
+make_args = ["-j%s", "-C", "build", "-f", "../Makefile"]
 ignored_symbols = [".text", ".data", ".bss", "__register_frame_info", "__deregister_frame_info", "LinkCannon_init", "LinkCannon_fini"]
