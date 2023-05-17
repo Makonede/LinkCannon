@@ -19,9 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <utility>
 
-#include <cstring>
-
-constexpr char MODULE_NAME[] = "Link Cannon";
+#define MODULE_NAME "Link Cannon"
 constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
 [[assume(std::in_range<int>(MODULE_NAME_SIZE))]];
 
@@ -35,5 +33,4 @@ struct ModuleName {
 };
 
 __attribute__((section(".nx-module-name")))
-const ModuleName s_ModuleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE)};
-std::strncpy(s_ModuleName.name, MODULE_NAME, MODULE_NAME_SIZE);
+constexpr ModuleName moduleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE), .name = MODULE_NAME};
