@@ -80,7 +80,7 @@ the given instructions.
 1. Clone the repository recursively.
 2. Create a directory in the repository called `dump`, and inside `dump`, one called
 `Pack` and one called `System`. Inside `System`, also create a folder called `Resource`.
-3. Plac your dumps of `Bootup.pack` and `Bootup_USen.pack` in `dump/Pack` and your
+3. Place your dumps of `Bootup.pack` and `Bootup_USen.pack` in `dump/Pack` and your
 dump of `ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
 4. To build on UNIX:
 
