@@ -25,13 +25,14 @@ constexpr char MODULE_NAME[] = "Link Cannon";
 constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
 [[assume(std::in_range<int>(MODULE_NAME_SIZE))]];
 
-__attribute__((section(".bss"))) char __nx_module_runtime[0xd0uz];
+__attribute__((section(".bss")))
+char __nx_module_runtime[0xd0uz];
+
 struct ModuleName {
   [[maybe_unused]] int unused;
   int nameSize;
   char name[MODULE_NAME_SIZE];
 };
-
 
 __attribute__((section(".nx-module-name")))
 const ModuleName s_ModuleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE)};
