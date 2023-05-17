@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
 [[assume(std::in_range<int>(MODULE_NAME_SIZE))]];
 
-__attribute__((section(".bss")))
+[[gnu::section(".bss")]]
 char __nx_module_runtime[0xd0uz];
 
 struct ModuleName {
@@ -32,5 +32,5 @@ struct ModuleName {
   char name[MODULE_NAME_SIZE];
 };
 
-__attribute__((section(".nx-module-name")))
+[[gnu::section(".nx-module-name")]]
 constexpr ModuleName moduleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE), .name = MODULE_NAME};
