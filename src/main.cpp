@@ -18,23 +18,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 #include <controller.hpp>
+#include <utility.hpp>
 
 #include <nn/os.h>
 
 #include <cstdlib>
 
 
-// Yield the thread and sleep for 1 μs
-// This allows other threads to work and prevents busy waiting while loops from
-// eating CPU cycles.
-auto Yield() noexcept {
-  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
-}
-
-
 // Main loop thread
 // The function is named _main in order to not be treated as the main function.
-auto _main([[maybe_unused]] auto *unused) noexcept {
+[[noreturn]] auto _main([[maybe_unused]] auto *unused) noexcept {
   ksys::evt::Manager *eventManager = nullptr;
   do [[unlikely]] {
     eventManager = ksys::evt::Manager::instance();
