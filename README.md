@@ -42,7 +42,7 @@ To update the mod, simply uninstall the mod with the instructions below and then
 install the latest version.
 
 ## Uninstallation
->
+
 > **Warning**
 > If you are using Link Cannon with other mods, this step will remove all of your
 > other Breath of the Wild mods.
@@ -99,9 +99,9 @@ the given instructions.
 dump of `ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
 4. To build on UNIX, run:
 
-  ```bash
-  ./compile
-  ```
+   ```bash
+   ./compile
+   ```
 
    To build on Windows, double-click `compile.bat`.
 
