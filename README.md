@@ -112,8 +112,8 @@ which I used as a scaffold and for helping debug and find mistakes.
 - [Shadów](https://github.com/shadowninja108) for helping with decompilation, for
 his [exlaunch](https://github.com/shadowninja108/exlaunch) framework, for helping
 debug crashes, and for his `crt0` template.
-- The [ZeldaRET](https://zelda64.dev) and [OpenEAD](https://github.com/open-ead)
-teams for their decompilations of [Breath of the Wild](https://github.com/zeldaret/botw),
+- The [ZeldaRET](https://zelda64.dev) and the [OpenEAD](https://github.com/open-ead)
+team for their decompilations of [Breath of the Wild](https://github.com/zeldaret/botw),
 [sead](https://github.com/open-ead/sead), and the [Nintendo SDK](https://github.com/open-ead/nnheaders).
 - [Prahaha](https://www.twitch.tv/prahaha) and [NotSoZany](https://www.twitch.tv/notsozany)
 for the original inspiration to create this mod.
