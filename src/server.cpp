@@ -31,7 +31,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 // Initialize the server
-auto Server::Init(unsigned short port) noexcept {
+auto Server::Init(unsigned short port) noexcept -> bool {
   // Initialize the Network Interface Module
   if (nn::nifm::Initialize().IsFailure()) [[unlikely]] {
     return false;
@@ -212,7 +212,7 @@ auto Server::Init(unsigned short port) noexcept {
 
 
 // Start the connection handler
-auto Server::Connect() noexcept {
+auto Server::Connect() noexcept -> bool {
   if (connected) [[unlikely]] {
     return true;
   }
@@ -253,7 +253,7 @@ auto Server::Connect() noexcept {
 
 
 // Receive data from the client
-auto Server::Read(std::size_t length) noexcept {
+auto Server::Read(std::size_t length) noexcept -> std::vector<unsigned char> {
   auto currentMessageId = ++messageId;
 
   // Set the length
@@ -287,7 +287,7 @@ auto Server::Read(std::size_t length) noexcept {
 
 
 // Send data to the client
-auto Server::Send(std::vector<unsigned char> data) noexcept {
+auto Server::Send(std::vector<unsigned char> data) noexcept -> void {
   auto currentMessageId = ++messageId;
 
   // Set the data

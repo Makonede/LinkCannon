@@ -27,6 +27,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstddef>
 
 
+[[noreturn]] auto HandleConnProxy(void *server) noexcept;
+
+
 class Server {
   [[noreturn]] auto HandleConnection() noexcept;
   friend auto HandleConnProxy(void *server) noexcept;
@@ -55,8 +58,8 @@ class Server {
   std::mutex lengthMutex;
 
   public:
-    auto Init(unsigned short port) noexcept;
-    auto Connect() noexcept;
-    auto Read(std::size_t length) noexcept;
-    auto Send(std::vector<unsigned char> data) noexcept;
+    auto Init(unsigned short port) noexcept -> bool;
+    auto Connect() noexcept -> bool;
+    auto Read(std::size_t length) noexcept -> std::vector<unsigned char>;
+    auto Send(std::vector<unsigned char> data) noexcept -> void;
 };
