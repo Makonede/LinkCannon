@@ -27,8 +27,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <netinet/in.h>
 
-#include <mutex>
-
 #include <cstdlib>
 
 
@@ -131,20 +129,47 @@ auto Server::Init(unsigned short port) noexcept {
     // Wait for a signal
     std::unique_lock<std::mutex> lock(signalMutex);
     signalCv.wait(lock, [this] {
-      return !signalQueue.empty();
+      return !signals.empty();
     });
 
     // Execute next signal
-    // false -> receive, true -> send
-    bool signal = signalQueue.front();
-    signalQueue.pop();
+    auto signalIt = signals.begin();
+    auto signal = signalIt->second;
+    auto currentMessageId = signalIt->first;
+    signals.erase(signalIt);
     lock.unlock();
 
-    if (signal) {
-      // send
-    }
-    else {
-      // receive
+    switch (signal) {
+      case sig::READ: {
+        // Receive data
+        auto lengthIt = lengths.find(currentMessageId);
+        auto length = lengthIt->second;
+        std::vector<unsigned char> data(length);
+
+        nn::socket::Recv(
+          clientSocket, static_cast<void *>(data.data()),
+          static_cast<unsigned long long>(data.size()), 0
+        );
+
+        // Add packet to queue
+        std::lock_guard<std::mutex> lock(inPacketMutex);
+        inPackets.at(currentMessageId) = data;
+      }
+
+      case sig::SEND: {
+        // Send data
+        auto dataIt = outPackets.find(currentMessageId);
+        auto data = dataIt->second;
+
+        nn::socket::Send(
+          clientSocket, static_cast<const void *>(data.data()),
+          static_cast<unsigned long long>(data.size()), 0
+        );
+
+        // Remove packet from queue
+        std::lock_guard<std::mutex> lock(outPacketMutex);
+        outPackets.erase(dataIt);
+      }
     }
   }
 }
@@ -158,7 +183,7 @@ auto Server::Init(unsigned short port) noexcept {
 
 // Start the connection handler
 auto Server::Connect() noexcept {
-  if (connected) {
+  if (connected) [[unlikely]] {
     return true;
   }
 
@@ -179,7 +204,7 @@ auto Server::Connect() noexcept {
   if (nn::os::CreateThread(
     &serverThread, HandleConnProxy, static_cast<void *>(this), stack,
     static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
-  ).IsFailure()) {
+  ).IsFailure()) [[unlikely]] {
     // Free the thread stack if it fails
     free(stack);
     return false;
@@ -194,4 +219,66 @@ auto Server::Connect() noexcept {
   } while (!connected);
 
   return true;
+}
+
+
+// Receive data from the client
+auto Server::Read(std::size_t length) noexcept {
+  auto currentMessageId = ++messageId;
+
+  // Set the length
+  {
+    std::lock_guard<std::mutex> lock(lengthMutex);
+    lengths.at(currentMessageId) = length;
+  }
+
+  // Broadcast the signal
+  {
+    std::lock_guard<std::mutex> lock(signalMutex);
+    signals.at(currentMessageId) = sig::READ;
+  }
+
+  signalCv.notify_one();
+
+  // Wait for a response
+  std::unique_lock<std::mutex> lock(inPacketMutex);
+  inPacketCv.wait(lock, [this, currentMessageId] {
+    return inPackets.find(currentMessageId) != inPackets.end();
+  });
+
+  // Return the response
+  auto packetIt = inPackets.find(currentMessageId);
+  auto packet = packetIt->second;
+  inPackets.erase(packetIt);
+  lock.unlock();
+
+  return packet;
+}
+
+
+// Send data to the client
+auto Server::Send(std::vector<unsigned char> data) noexcept {
+  auto currentMessageId = ++messageId;
+
+  // Set the data
+  {
+    std::lock_guard<std::mutex> lock(outPacketMutex);
+    outPackets.at(currentMessageId) = data;
+  }
+
+  // Broadcast the signal
+  {
+    std::lock_guard<std::mutex> lock(signalMutex);
+    signals.at(currentMessageId) = sig::SEND;
+  }
+
+  signalCv.notify_one();
+
+  // Wait for the packet to be sent
+  std::unique_lock<std::mutex> lock(outPacketMutex);
+  outPacketCv.wait(lock, [this, currentMessageId] {
+    return outPackets.find(currentMessageId) == outPackets.end();
+  });
+
+  lock.unlock();
 }

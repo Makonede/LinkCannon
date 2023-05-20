@@ -1,5 +1,5 @@
 /*
-server.cpp - Header file for the data socket server.
+server.hpp - Header file for the data socket server.
 Copyright (C) 2023  Makonede
 
 This program is free software: you can redistribute it and/or modify
@@ -20,22 +20,41 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <condition_variable>
+#include <map>
 #include <mutex>
-#include <queue>
+#include <vector>
+
+#include <cstddef>
 
 
 class Server {
+  enum class sig : unsigned char {
+    READ = 0,
+    SEND = 1
+  };
+
   int serverSocket = -1;
   int clientSocket = -1;
   bool connected = false;
-  std::queue<bool> signalQueue;
+  int messageId = 0;
+
+  std::map<int, sig> signals;
   std::mutex signalMutex;
   std::condition_variable signalCv;
+
+  std::map<int, std::vector<unsigned char>> inPackets;
+  std::mutex inPacketMutex;
+  std::condition_variable inPacketCv;
+  std::map<int, std::vector<unsigned char>> outPackets;
+  std::mutex outPacketMutex;
+  std::condition_variable outPacketCv;
+  std::map<int, std::size_t> lengths;
+  std::mutex lengthMutex;
 
   public:
     auto Init(unsigned short port) noexcept;
     [[noreturn]] auto HandleConnection() noexcept;
     auto Connect() noexcept;
-    auto *Read(unsigned long long length) noexcept;
-    auto Send(unsigned char *data) noexcept;
+    auto Read(std::size_t length) noexcept;
+    auto Send(std::vector<unsigned char> data) noexcept;
 };
