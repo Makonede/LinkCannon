@@ -30,9 +30,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
-constexpr auto PORT = 52617;
-
-
 // Initialize the server
 auto Server::Init(unsigned short port) noexcept {
   // Initialize the Network Interface Module
@@ -84,7 +81,7 @@ auto Server::Init(unsigned short port) noexcept {
 
   // Bind to all available network interfaces
   sockaddr_in address{
-    .sin_family = AF_INET, .sin_port = nn::socket::InetHtons(PORT)
+    .sin_family = AF_INET, .sin_port = nn::socket::InetHtons(port)
   };
   nn::socket::InetAton(
     "0.0.0.0", reinterpret_cast<nn::socket::InAddr *>(&address.sin_addr.s_addr)
@@ -120,7 +117,6 @@ auto Server::Init(unsigned short port) noexcept {
   // Accept an incoming connection
   do [[unlikely]] {
     clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-    Yield();
   } while (clientSocket < 0);
 
   connected = true;
@@ -146,10 +142,29 @@ auto Server::Init(unsigned short port) noexcept {
         auto length = lengthIt->second;
         std::vector<unsigned char> data(length);
 
-        nn::socket::Recv(
+        auto result = nn::socket::Recv(
           clientSocket, static_cast<void *>(data.data()),
           static_cast<unsigned long long>(data.size()), 0
         );
+
+        while (result <= 0) [[unlikely]] {
+          // result == 0: Client closed the connection
+          // result < 0: An error occurred
+          if (!result) [[likely]] {
+            // Connection has been lost; reconnect
+            clientSocket = -1;
+
+            do [[unlikely]] {
+              clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+            } while (clientSocket < 0);
+          }
+
+          // Retry the operation
+          result = nn::socket::Recv(
+            clientSocket, static_cast<void *>(data.data()),
+            static_cast<unsigned long long>(data.size()), 0
+          );
+        }
 
         // Add packet to queue
         std::lock_guard<std::mutex> lock(inPacketMutex);
@@ -161,10 +176,25 @@ auto Server::Init(unsigned short port) noexcept {
         auto dataIt = outPackets.find(currentMessageId);
         auto data = dataIt->second;
 
-        nn::socket::Send(
+        auto result = nn::socket::Send(
           clientSocket, static_cast<const void *>(data.data()),
           static_cast<unsigned long long>(data.size()), 0
         );
+
+        while (result <= 0) [[unlikely]] {
+          if (!result) [[likely]] {
+            clientSocket = -1;
+
+            do [[unlikely]] {
+              clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+            } while (clientSocket < 0);
+          }
+
+          result = nn::socket::Send(
+            clientSocket, static_cast<const void *>(data.data()),
+            static_cast<unsigned long long>(data.size()), 0
+          );
+        }
 
         // Remove packet from queue
         std::lock_guard<std::mutex> lock(outPacketMutex);

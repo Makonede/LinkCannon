@@ -26,21 +26,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstdlib>
 
 
-// Main loop thread
-// The function is named _main in order to not be treated as the main function.
-[[noreturn]] auto _main([[maybe_unused]] auto *unused) noexcept {
+constexpr auto PORT = 52617;
+
+
+// Event caller thread
+[[noreturn]] auto EventThread([[maybe_unused]] auto *unused) noexcept {
+  // Wait for the event manager instance
   ksys::evt::Manager *eventManager = nullptr;
   do [[unlikely]] {
     eventManager = ksys::evt::Manager::instance();
     Yield();
   } while (eventManager == nullptr);
 
+  // Wait for the controller manager instance
   sead::ControllerMgr *controllerManager = nullptr;
   do [[unlikely]] {
     controllerManager = sead::ControllerMgr::instance();
     Yield();
   } while (controllerManager == nullptr);
 
+  // Wait for the controller instance
   sead::Controller *controller = nullptr;
   do [[unlikely]] {
     controller = controllerManager->getController(0);
@@ -70,33 +75,65 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 }
 
 
+// Network data thread
+[[noreturn]] auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
+  // Initialize the server
+  Server server;
+
+  while (!server.Init(PORT)) [[unlikely]] {
+    Yield();
+  }
+
+  // Connect to the client
+  while (!server.Connect()) [[unlikely]] {
+    Yield();
+  }
+
+  // TODO: Send meaningful data
+  // Simple network cat: read data and send it back
+  constexpr auto DATA_SIZE = 0x10000uz;
+
+  while (true) [[likely]] {
+    server.Send(server.Read(DATA_SIZE));
+  }
+}
+
+
 // Initialization function (entrypoint)
 extern "C" auto LinkCannon_init() noexcept {
-  static nn::os::ThreadType mainThread;
+  static nn::os::ThreadType eventThread;
+  static nn::os::ThreadType networkThread;
 
-  // Allocate memory for the main thread stack
+  // Allocate memory for the thread stacks
   constexpr auto STACK_SIZE = 0x80000uz;
   constexpr auto ALIGNMENT = 0x1000uz;
-  auto *stack = aligned_alloc(ALIGNMENT, STACK_SIZE);
 
-  if (stack == nullptr) [[unlikely]] {
+  auto *eventStack = aligned_alloc(ALIGNMENT, STACK_SIZE);
+  auto *networkStack = aligned_alloc(ALIGNMENT, STACK_SIZE);
+
+  if (eventStack == nullptr || networkStack == nullptr) [[unlikely]] {
     return;
   }
 
-  // Attempt to create the main thread
+  // Attempt to create the threads
   constexpr auto PRIORITY = 16;
 
   if (nn::os::CreateThread(
-    &mainThread, _main, nullptr, stack,
+    &eventThread, EventThread, nullptr, eventStack,
+    static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
+  ).IsFailure() || nn::os::CreateThread(
+    &networkThread, NetworkThread, nullptr, networkStack,
     static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
   ).IsFailure()) [[unlikely]] {
-    // Free the thread stack if it fails
-    free(stack);
+    // Free the thread stacks if it fails
+    free(eventStack);
+    free(networkStack);
     return;
   }
 
-  // Start the thread
-  nn::os::StartThread(&mainThread);
+  // Start the threads
+  nn::os::StartThread(&eventThread);
+  nn::os::StartThread(&networkThread);
 }
 
 

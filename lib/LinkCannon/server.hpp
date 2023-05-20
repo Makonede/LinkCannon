@@ -28,6 +28,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 class Server {
+  [[noreturn]] auto HandleConnection() noexcept;
+  friend auto HandleConnProxy(void *server) noexcept;
+
   enum class sig : unsigned char {
     READ = 0,
     SEND = 1
@@ -53,7 +56,6 @@ class Server {
 
   public:
     auto Init(unsigned short port) noexcept;
-    [[noreturn]] auto HandleConnection() noexcept;
     auto Connect() noexcept;
     auto Read(std::size_t length) noexcept;
     auto Send(std::vector<unsigned char> data) noexcept;
