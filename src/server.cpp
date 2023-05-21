@@ -175,7 +175,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 
         // Add packet to queue
         std::lock_guard<std::mutex> lock(inPacketMutex);
-        inPackets.at(currentMessageId) = data;
+        inPackets[currentMessageId] = data;
       }
 
       case sig::SEND: {
