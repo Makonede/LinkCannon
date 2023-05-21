@@ -23,6 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <nn/os.h>
 
+#include <string>
+
 #include <cstdlib>
 
 
@@ -90,11 +92,10 @@ auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   }
 
   // TODO: Send meaningful data
-  // Simple network cat: read data and send it back
-  constexpr auto DATA_SIZE = 0x1000uz;
+  std::string hello("Hello from Nintendo Switch!");
 
-  for (auto i = 0; i < 10; ++i) [[likely]] {
-    server.Send(server.Read(DATA_SIZE));
+  while (true) [[likely]] {
+    server.Send(std::vector<unsigned char>(hello.begin(), hello.end()));
   }
 }
 
