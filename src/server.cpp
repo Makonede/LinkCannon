@@ -178,6 +178,9 @@ auto Server::Init(unsigned short port) noexcept -> bool {
           std::lock_guard<std::mutex> lock(inPacketMutex);
           inPackets[currentMessageId] = data;
         }
+
+        // Notify Server::Read to return
+        inPacketCv.notify_all();
       }
 
       case sig::SEND: {
@@ -213,6 +216,9 @@ auto Server::Init(unsigned short port) noexcept -> bool {
           std::lock_guard<std::mutex> lock(outPacketMutex);
           outPackets.erase(dataIt);
         }
+
+        // Notify Server::Send to return
+        outPacketCv.notify_all();
       }
     }
   }
