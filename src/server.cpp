@@ -269,13 +269,13 @@ auto Server::Read(std::size_t length) noexcept -> std::vector<unsigned char> {
   // Set the length
   {
     std::lock_guard<std::mutex> lock(lengthMutex);
-    lengths.at(currentMessageId) = length;
+    lengths[currentMessageId] = length;
   }
 
   // Broadcast the signal
   {
     std::lock_guard<std::mutex> lock(signalMutex);
-    signals.at(currentMessageId) = sig::READ;
+    signals[currentMessageId] = sig::READ;
   }
 
   signalCv.notify_one();
@@ -303,13 +303,13 @@ auto Server::Send(std::vector<unsigned char> data) noexcept -> void {
   // Set the data
   {
     std::lock_guard<std::mutex> lock(outPacketMutex);
-    outPackets.at(currentMessageId) = data;
+    outPackets[currentMessageId] = data;
   }
 
   // Broadcast the signal
   {
     std::lock_guard<std::mutex> lock(signalMutex);
-    signals.at(currentMessageId) = sig::SEND;
+    signals[currentMessageId] = sig::SEND;
   }
 
   signalCv.notify_one();
