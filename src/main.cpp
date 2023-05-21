@@ -91,9 +91,9 @@ constexpr auto PORT = 52617;
 
   // TODO: Send meaningful data
   // Simple network cat: read data and send it back
-  constexpr auto DATA_SIZE = 0x10000uz;
+  constexpr auto DATA_SIZE = 0x1000uz;
 
-  while (true) [[likely]] {
+  for (auto i = 0; i < 10; ++i) [[likely]] {
     server.Send(server.Read(DATA_SIZE));
   }
 }
