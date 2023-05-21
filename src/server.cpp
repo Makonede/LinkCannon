@@ -60,7 +60,10 @@ auto Server::Init(unsigned short port) noexcept -> bool {
   }
 
   // Request a network interface
-  nn::nifm::SubmitNetworkRequestAndWait();
+  nn::nifm::SubmitNetworkRequest();
+  while (nn::nifm::IsNetworkRequestOnHold()) {
+    Yield();
+  }
 
   if (!nn::nifm::IsNetworkAvailable()) [[unlikely]] {
     nn::socket::Finalize();
@@ -117,6 +120,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
   // Accept an incoming connection
   do [[unlikely]] {
     clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+    Yield();
   } while (clientSocket < 0);
 
   connected = true;
@@ -148,6 +152,8 @@ auto Server::Init(unsigned short port) noexcept -> bool {
         );
 
         while (result <= 0) [[unlikely]] {
+          Yield();
+
           // result == 0: Client closed the connection
           // result < 0: An error occurred
           if (!result) [[likely]] {
@@ -156,6 +162,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 
             do [[unlikely]] {
               clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+              Yield();
             } while (clientSocket < 0);
           }
 
@@ -182,11 +189,14 @@ auto Server::Init(unsigned short port) noexcept -> bool {
         );
 
         while (result <= 0) [[unlikely]] {
+          Yield();
+
           if (!result) [[likely]] {
             clientSocket = -1;
 
             do [[unlikely]] {
               clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+              Yield();
             } while (clientSocket < 0);
           }
 
