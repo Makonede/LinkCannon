@@ -76,7 +76,7 @@ constexpr auto PORT = 52617;
 
 
 // Network data thread
-[[noreturn]] auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
+auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   // Initialize the server
   Server server;
 
