@@ -174,8 +174,10 @@ auto Server::Init(unsigned short port) noexcept -> bool {
         }
 
         // Add packet to queue
-        std::lock_guard<std::mutex> lock(inPacketMutex);
-        inPackets[currentMessageId] = data;
+        {
+          std::lock_guard<std::mutex> lock(inPacketMutex);
+          inPackets[currentMessageId] = data;
+        }
       }
 
       case sig::SEND: {
@@ -207,8 +209,10 @@ auto Server::Init(unsigned short port) noexcept -> bool {
         }
 
         // Remove packet from queue
-        std::lock_guard<std::mutex> lock(outPacketMutex);
-        outPackets.erase(dataIt);
+        {
+          std::lock_guard<std::mutex> lock(outPacketMutex);
+          outPackets.erase(dataIt);
+        }
       }
     }
   }
