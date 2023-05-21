@@ -158,6 +158,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
           // result < 0: An error occurred
           if (!result) [[likely]] {
             // Connection has been lost; reconnect
+            nn::socket::Close(clientSocket);
             clientSocket = -1;
 
             do [[unlikely]] {
@@ -197,6 +198,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
           Yield();
 
           if (!result) [[likely]] {
+            nn::socket::Close(clientSocket);
             clientSocket = -1;
 
             do [[unlikely]] {
