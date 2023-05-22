@@ -113,8 +113,8 @@ which I used as a scaffold and for helping debug and find mistakes.
 his [exlaunch](https://github.com/shadowninja108/exlaunch) framework, for helping
 debug crashes, and for his `crt0` template.
 - The [ZeldaRET](https://zelda64.dev) and the [OpenEAD](https://github.com/open-ead)
-team for their decompilations of [Breath of the Wild](https://github.com/zeldaret/botw),
-[sead](https://github.com/open-ead/sead), and the [Nintendo SDK](https://github.com/open-ead/nnheaders).
+team for their decompilations of [Breath of the Wild](https://botw.link), [sead](https://github.com/open-ead/sead),
+and the [Nintendo SDK](https://github.com/open-ead/nnheaders).
 - [Prahaha](https://www.twitch.tv/prahaha) and [NotSoZany](https://www.twitch.tv/notsozany)
 for the original inspiration to create this mod.
 - [savage13](https://restite.org) for his button image generator tool.
