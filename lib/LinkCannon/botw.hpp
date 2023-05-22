@@ -23,3 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <KingSystem/Event/evtMetadata.h>
 
 #include <controller/seadControllerMgr.h>
+
+
+namespace botw {
+  extern unsigned char *Memory;
+}
