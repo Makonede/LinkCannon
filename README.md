@@ -117,6 +117,6 @@ team for their decompilations of [Breath of the Wild](https://botw.link), [sead]
 and the [Nintendo SDK](https://github.com/open-ead/nnheaders).
 - [Prahaha](https://www.twitch.tv/prahaha) and [NotSoZany](https://www.twitch.tv/notsozany)
 for the original inspiration to create this mod.
-- [savage13](https://restite.org) for his button image generator tool.
+- [savage13](https://restite.org) for his [button image generator tool](https://restite.org/dpad).
 
 [Python]: https://www.python.org/downloads/
