@@ -27,6 +27,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <netinet/in.h>
 
+#include <string>
+
 #include <cstdlib>
 
 
@@ -115,15 +117,96 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 }
 
 
+// Reconnect to the client
+auto Server::Reconnect() noexcept {
+  // Close and reset the socket
+  nn::socket::Close(clientSocket);
+  clientSocket = -1;
+
+  // Wait for a new connection
+  do [[unlikely]] {
+    clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+  } while (clientSocket < 0);
+}
+
+
+// Acknowledge a received message
+auto Server::Ack() noexcept {
+  if (!connected) [[unlikely]] {
+    return;
+  }
+
+  Send(std::vector<unsigned char>{
+    static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+    static_cast<unsigned char>('\1')
+  });
+}
+
+
 // Wait for and accept incoming connections and receive and send data
 [[noreturn]] auto Server::HandleConnection() noexcept {
   // Accept an incoming connection
   do [[unlikely]] {
     clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-    Yield();
   } while (clientSocket < 0);
 
   connected = true;
+
+  // Receive a handshake
+  std::vector<unsigned char> handshake(3);
+  auto handshakeResult = nn::socket::Recv(
+    clientSocket, static_cast<void *>(handshake.data()),
+    static_cast<unsigned long long>(handshake.size()), 0
+  );
+
+  while (handshake != std::vector<unsigned char>{
+    static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+    static_cast<unsigned char>('\0')
+  }) [[unlikely]] {
+    if (handshakeResult > 0) [[unlikely]] {
+      // A proper handshake was not received
+      Reconnect();
+
+      // Retry the handshake
+      handshakeResult = nn::socket::Recv(
+        clientSocket, static_cast<void *>(handshake.data()),
+        static_cast<unsigned long long>(handshake.size()), 0
+      );
+    }
+
+    while (handshakeResult <= 0) [[likely]] {
+      // result == 0: Client closed the connection
+      // result < 0: An error occurred
+      if (!handshakeResult) [[likely]] {
+        // Connection has been lost
+        Reconnect();
+      }
+
+      handshakeResult = nn::socket::Recv(
+        clientSocket, static_cast<void *>(handshake.data()),
+        static_cast<unsigned long long>(handshake.size()), 0
+      );
+    }
+  }
+
+  // Acknowledge the handshake
+  std::string ack("LC\1");
+
+  auto ackResult = nn::socket::Send(
+    clientSocket, static_cast<const void *>(ack.data()),
+    static_cast<unsigned long long>(ack.size()), 0
+  );
+
+  while (ackResult <= 0) [[unlikely]] {
+    if (!ackResult) [[likely]] {
+      Reconnect();
+    }
+
+    ackResult = nn::socket::Send(
+      clientSocket, static_cast<const void *>(ack.data()),
+      static_cast<unsigned long long>(ack.size()), 0
+    );
+  }
 
   while (true) [[likely]] {
     // Wait for a signal
@@ -152,22 +235,10 @@ auto Server::Init(unsigned short port) noexcept -> bool {
         );
 
         while (result <= 0) [[unlikely]] {
-          Yield();
-
-          // result == 0: Client closed the connection
-          // result < 0: An error occurred
           if (!result) [[likely]] {
-            // Connection has been lost; reconnect
-            nn::socket::Close(clientSocket);
-            clientSocket = -1;
-
-            do [[unlikely]] {
-              clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-              Yield();
-            } while (clientSocket < 0);
+            Reconnect();
           }
 
-          // Retry the operation
           result = nn::socket::Recv(
             clientSocket, static_cast<void *>(data.data()),
             static_cast<unsigned long long>(data.size()), 0
@@ -195,16 +266,8 @@ auto Server::Init(unsigned short port) noexcept -> bool {
         );
 
         while (result <= 0) [[unlikely]] {
-          Yield();
-
           if (!result) [[likely]] {
-            nn::socket::Close(clientSocket);
-            clientSocket = -1;
-
-            do [[unlikely]] {
-              clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-              Yield();
-            } while (clientSocket < 0);
+            Reconnect();
           }
 
           result = nn::socket::Send(

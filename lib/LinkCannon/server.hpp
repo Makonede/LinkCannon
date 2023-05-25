@@ -32,11 +32,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class Server {
   [[noreturn]] auto HandleConnection() noexcept;
+  auto Reconnect() noexcept;
+  auto Ack() noexcept;
+  auto StartMessage() noexcept;
+
   friend auto HandleConnProxy(void *server) noexcept;
 
   enum class sig : unsigned char {
-    READ = 0,
-    SEND = 1
+    READ,
+    SEND
+  };
+
+  enum class end : unsigned char {
+    CLIENT,
+    SERVER
   };
 
   int serverSocket = -1;
