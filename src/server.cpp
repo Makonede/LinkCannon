@@ -190,7 +190,7 @@ auto Server::Ack() noexcept {
   }
 
   // Acknowledge the handshake
-  std::string ack("LC\1");
+  const std::string ack("LC\1");
 
   auto ackResult = nn::socket::Send(
     clientSocket, static_cast<const void *>(ack.data()),
