@@ -160,7 +160,7 @@ auto Server::StartMessage(end endpoint) noexcept {
   connected = true;
 
   // Receive a handshake
-  std::vector<unsigned char> handshake(3);
+  std::vector<unsigned char> handshake(3uz);
   auto handshakeResult = nn::socket::Recv(
     clientSocket, static_cast<void *>(handshake.data()),
     static_cast<unsigned long long>(handshake.size()), 0
