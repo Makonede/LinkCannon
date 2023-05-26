@@ -133,13 +133,20 @@ auto Server::Reconnect() noexcept {
 // Acknowledge a received message
 auto Server::Ack() noexcept {
   if (!connected) [[unlikely]] {
-    return;
+    return false;
   }
 
   Send(std::vector<unsigned char>{
     static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
     static_cast<unsigned char>('\1')
   });
+  return true;
+}
+
+
+// Start a message from the passed endpoint
+auto Server::StartMessage(end endpoint) noexcept {
+
 }
 
 
