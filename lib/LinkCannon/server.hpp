@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <condition_variable>
 #include <map>
 #include <mutex>
+#include <string>
 #include <vector>
 
 #include <cstddef>
@@ -34,6 +35,7 @@ class Server {
   [[noreturn]] auto HandleConnection() noexcept;
   auto Reconnect() noexcept;
   auto Ack() noexcept;
+  auto ReadAck() noexcept;
 
   friend auto HandleConnProxy(void *server) noexcept;
 
@@ -46,7 +48,17 @@ class Server {
     CLIENT,
     SERVER
   };
-  auto StartMessage(end endpoint) noexcept;
+  auto StartMessage(end endpoint, std::vector<unsigned char> codeVec) noexcept;
+
+  const std::vector<unsigned char> ACK{
+    static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+    static_cast<unsigned char>('\1')
+  };
+  const std::vector<std::string> MESSAGES{
+    std::string("ADDR"),
+    std::string("RADD"),
+    std::string("DATA")
+  };
 
   int serverSocket = -1;
   int clientSocket = -1;

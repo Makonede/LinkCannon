@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <netinet/in.h>
 
-#include <string>
+#include <algorithm>
 
 #include <cstdlib>
 
@@ -132,21 +132,55 @@ auto Server::Reconnect() noexcept {
 
 // Acknowledge a received message
 auto Server::Ack() noexcept {
-  if (!connected) [[unlikely]] {
-    return false;
-  }
+  Send(ACK);
+}
 
-  Send(std::vector<unsigned char>{
-    static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
-    static_cast<unsigned char>('\1')
-  });
-  return true;
+
+// Read an ack message
+auto Server::ReadAck() noexcept {
+  return Read(3uz) == ACK;
 }
 
 
 // Start a message from the passed endpoint
-auto Server::StartMessage(end endpoint) noexcept {
+auto Server::StartMessage(
+  end endpoint, std::vector<unsigned char> codeVec = {}
+) noexcept {
+  switch (endpoint) {
+    case end::CLIENT: {
+      // Read the message code
+      codeVec = Read(4uz);
+      auto code = std::string(codeVec.begin(), codeVec.end());
 
+      // Check if the code exists
+      if (std::find(
+        MESSAGES.begin(), MESSAGES.end(), code
+      ) == MESSAGES.end()) [[unlikely]] {
+        return false;
+      }
+
+      Ack();
+    }
+
+    case end::SERVER: {
+      // Check if the code exists
+      auto code = std::string(codeVec.begin(), codeVec.end());
+
+      if (std::find(
+        MESSAGES.begin(), MESSAGES.end(), code
+      ) == MESSAGES.end()) [[unlikely]] {
+        return false;
+      }
+
+      // Send the message code
+      Send(codeVec);
+
+      // Check if the client received the message
+      return ReadAck();
+    }
+  }
+
+  return false;
 }
 
 
@@ -260,6 +294,7 @@ auto Server::StartMessage(end endpoint) noexcept {
 
         // Notify Server::Read to return
         inPacketCv.notify_all();
+        break;
       }
 
       case sig::SEND: {
