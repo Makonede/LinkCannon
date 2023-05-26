@@ -34,7 +34,6 @@ class Server {
   [[noreturn]] auto HandleConnection() noexcept;
   auto Reconnect() noexcept;
   auto Ack() noexcept;
-  auto StartMessage() noexcept;
 
   friend auto HandleConnProxy(void *server) noexcept;
 
@@ -47,6 +46,7 @@ class Server {
     CLIENT,
     SERVER
   };
+  auto StartMessage(end endpoint) noexcept;
 
   int serverSocket = -1;
   int clientSocket = -1;
