@@ -191,8 +191,6 @@ auto Server::StartMessage(
     clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
   } while (clientSocket < 0);
 
-  connected = true;
-
   // Receive a handshake
   std::vector<unsigned char> handshake(3uz);
   auto handshakeResult = nn::socket::Recv(
@@ -248,6 +246,8 @@ auto Server::StartMessage(
       static_cast<unsigned long long>(ack.size()), 0
     );
   }
+
+  connected = true;
 
   while (true) [[likely]] {
     // Wait for a signal
