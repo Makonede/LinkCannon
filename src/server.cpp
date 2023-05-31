@@ -130,24 +130,6 @@ inline auto Server::Reconnect() noexcept {
 }
 
 
-// Acknowledge a received message
-inline auto Server::Ack() noexcept -> void {
-  Send(ACK);
-}
-
-
-// Don't acknowledge a received message
-inline auto Server::Nack() noexcept -> void {
-  Send(NACK);
-}
-
-
-// Read an ack message
-inline auto Server::ReadAck() noexcept -> bool {
-  return Read(3uz) == ACK;
-}
-
-
 // Start a message from the passed endpoint
 auto Server::StartMessage(
   const end endpoint, std::string &code

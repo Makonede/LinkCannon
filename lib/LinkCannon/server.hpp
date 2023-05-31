@@ -89,12 +89,20 @@ class Server {
     auto Connect() noexcept -> bool;
     auto Read(const std::size_t length) noexcept -> std::vector<unsigned char>;
     auto Send(const std::vector<unsigned char> data) noexcept -> void;
-    auto Ack() noexcept -> void;
-    auto Nack() noexcept -> void;
-    auto ReadAck() noexcept -> bool;
+
+    inline auto Ack() noexcept -> void {
+      Send(ACK);
+    }
+    inline auto Nack() noexcept -> void {
+      Send(NACK);
+    }
+    inline auto ReadAck() noexcept -> bool {
+      return Read(3uz) == ACK;
+    }
+
     auto StartMessage(end endpoint, std::string &code) noexcept -> bool;
 
-    std::map<unsigned char *, std::size_t> watched;
+    std::map<std::size_t, std::size_t> watched;
     std::mutex watchedMutex;
     std::condition_variable watchedCv;
 };

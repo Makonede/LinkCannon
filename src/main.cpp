@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <nn/os.h>
 
 #include <cstdlib>
+#include <cstring>
 
 
 constexpr auto PORT = 52617;
@@ -114,8 +115,7 @@ constexpr auto PORT = 52617;
 
       // Send the data
       server->Send(std::vector(
-        reinterpret_cast<const unsigned char *>(address),
-        reinterpret_cast<const unsigned char *>(address) + size
+        botw::Memory + address, botw::Memory + address + size
       ));
 
       if (!server->ReadAck()) [[unlikely]] {
@@ -170,10 +170,8 @@ auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
     if (code == "ADDR"s) {
       // ADDR - add address to watch
-      auto *address = *reinterpret_cast<unsigned char **>(
-        server.Read(8).data()
-      );
-      auto size = *reinterpret_cast<std::size_t *>(server.Read(8).data());
+      auto address = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
+      auto size = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
 
       // Start watching the address or update its maximum size
       {
@@ -188,9 +186,7 @@ auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
     }
     else if (code == "RADD"s) {
       // RADD - stop watching address
-      auto *address = *reinterpret_cast<unsigned char **>(
-        server.Read(8).data()
-      );
+      auto address = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
 
       // If the address is being watched, stop watching it
       {
@@ -207,6 +203,21 @@ auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
       }
 
       server.watchedCv.notify_one();
+    }
+    else if (code == "DATA"s) {
+      // DATA - write data to address
+      auto address = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
+      auto size = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
+      server.Ack();
+
+      // Read and write the data
+      const auto *data = server.Read(size).data();
+      std::memcpy(
+        static_cast<void *>(botw::Memory + address),
+        static_cast<const void *>(data), size
+      );
+
+      server.Ack();
     }
   }
 }
