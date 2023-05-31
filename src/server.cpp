@@ -118,7 +118,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 
 
 // Reconnect to the client
-auto Server::Reconnect() noexcept {
+inline auto Server::Reconnect() noexcept {
   // Close and reset the socket
   nn::socket::Close(clientSocket);
   clientSocket = -1;
@@ -131,26 +131,32 @@ auto Server::Reconnect() noexcept {
 
 
 // Acknowledge a received message
-auto Server::Ack() noexcept {
+inline auto Server::Ack() noexcept -> void {
   Send(ACK);
 }
 
 
+// Don't acknowledge a received message
+inline auto Server::Nack() noexcept -> void {
+  Send(NACK);
+}
+
+
 // Read an ack message
-auto Server::ReadAck() noexcept {
+inline auto Server::ReadAck() noexcept -> bool {
   return Read(3uz) == ACK;
 }
 
 
 // Start a message from the passed endpoint
 auto Server::StartMessage(
-  end endpoint, std::vector<unsigned char> codeVec = {}
-) noexcept {
+  const end endpoint, std::string &code
+) noexcept -> bool {
   switch (endpoint) {
     case end::CLIENT: {
       // Read the message code
-      codeVec = Read(4uz);
-      auto code = std::string(codeVec.begin(), codeVec.end());
+      auto codeVec = Read(4uz);
+      code = std::string(codeVec.begin(), codeVec.end());
 
       // Check if the code exists
       if (std::find(
@@ -164,8 +170,6 @@ auto Server::StartMessage(
 
     case end::SERVER: {
       // Check if the code exists
-      auto code = std::string(codeVec.begin(), codeVec.end());
-
       if (std::find(
         MESSAGES.begin(), MESSAGES.end(), code
       ) == MESSAGES.end()) [[unlikely]] {
@@ -173,7 +177,7 @@ auto Server::StartMessage(
       }
 
       // Send the message code
-      Send(codeVec);
+      Send(std::vector<unsigned char>(code.begin(), code.end()));
 
       // Check if the client received the message
       return ReadAck();
@@ -198,10 +202,7 @@ auto Server::StartMessage(
     static_cast<unsigned long long>(handshake.size()), 0
   );
 
-  while (handshake != std::vector<unsigned char>{
-    static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
-    static_cast<unsigned char>('\0')
-  }) [[unlikely]] {
+  while (handshake != HANDSHAKE) [[unlikely]] {
     if (handshakeResult > 0) [[unlikely]] {
       // A proper handshake was not received
       Reconnect();
@@ -229,11 +230,9 @@ auto Server::StartMessage(
   }
 
   // Acknowledge the handshake
-  const std::string ack("LC\1");
-
   auto ackResult = nn::socket::Send(
-    clientSocket, static_cast<const void *>(ack.data()),
-    static_cast<unsigned long long>(ack.size()), 0
+    clientSocket, static_cast<const void *>(ACK.data()),
+    static_cast<unsigned long long>(ACK.size()), 0
   );
 
   while (ackResult <= 0) [[unlikely]] {
@@ -242,8 +241,8 @@ auto Server::StartMessage(
     }
 
     ackResult = nn::socket::Send(
-      clientSocket, static_cast<const void *>(ack.data()),
-      static_cast<unsigned long long>(ack.size()), 0
+      clientSocket, static_cast<const void *>(ACK.data()),
+      static_cast<unsigned long long>(ACK.size()), 0
     );
   }
 
@@ -288,7 +287,7 @@ auto Server::StartMessage(
 
         // Add packet to queue
         {
-          std::lock_guard<std::mutex> lock(inPacketMutex);
+          const std::lock_guard<std::mutex> lock(inPacketMutex);
           inPackets[currentMessageId] = data;
         }
 
@@ -320,7 +319,7 @@ auto Server::StartMessage(
 
         // Remove packet from queue
         {
-          std::lock_guard<std::mutex> lock(outPacketMutex);
+          const std::lock_guard<std::mutex> lock(outPacketMutex);
           outPackets.erase(dataIt);
         }
 
@@ -333,7 +332,7 @@ auto Server::StartMessage(
 
 
 // void (*)(void *) proxy for HandleConnection
-[[noreturn]] auto HandleConnProxy(void *server) noexcept {
+[[noreturn]] inline auto HandleConnProxy(void *server) noexcept {
   static_cast<Server *>(server)->HandleConnection();
 }
 
@@ -380,18 +379,20 @@ auto Server::Connect() noexcept -> bool {
 
 
 // Receive data from the client
-auto Server::Read(std::size_t length) noexcept -> std::vector<unsigned char> {
+auto Server::Read(
+  const std::size_t length
+) noexcept -> std::vector<unsigned char> {
   auto currentMessageId = ++messageId;
 
   // Set the length
   {
-    std::lock_guard<std::mutex> lock(lengthMutex);
+    const std::lock_guard<std::mutex> lock(lengthMutex);
     lengths[currentMessageId] = length;
   }
 
   // Broadcast the signal
   {
-    std::lock_guard<std::mutex> lock(signalMutex);
+    const std::lock_guard<std::mutex> lock(signalMutex);
     signals[currentMessageId] = sig::READ;
   }
 
@@ -400,7 +401,7 @@ auto Server::Read(std::size_t length) noexcept -> std::vector<unsigned char> {
   // Wait for a response
   std::unique_lock<std::mutex> lock(inPacketMutex);
   inPacketCv.wait(lock, [this, currentMessageId] {
-    return inPackets.find(currentMessageId) != inPackets.end();
+    return inPackets.contains(currentMessageId);
   });
 
   // Return the response
@@ -414,18 +415,18 @@ auto Server::Read(std::size_t length) noexcept -> std::vector<unsigned char> {
 
 
 // Send data to the client
-auto Server::Send(std::vector<unsigned char> data) noexcept -> void {
+auto Server::Send(const std::vector<unsigned char> data) noexcept -> void {
   auto currentMessageId = ++messageId;
 
   // Set the data
   {
-    std::lock_guard<std::mutex> lock(outPacketMutex);
+    const std::lock_guard<std::mutex> lock(outPacketMutex);
     outPackets[currentMessageId] = data;
   }
 
   // Broadcast the signal
   {
-    std::lock_guard<std::mutex> lock(signalMutex);
+    const std::lock_guard<std::mutex> lock(signalMutex);
     signals[currentMessageId] = sig::SEND;
   }
 
@@ -434,7 +435,7 @@ auto Server::Send(std::vector<unsigned char> data) noexcept -> void {
   // Wait for the packet to be sent
   std::unique_lock<std::mutex> lock(outPacketMutex);
   outPacketCv.wait(lock, [this, currentMessageId] {
-    return outPackets.find(currentMessageId) == outPackets.end();
+    return !outPackets.contains(currentMessageId);
   });
 
   lock.unlock();

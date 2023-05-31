@@ -27,6 +27,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
 
+using namespace std::string_literals;
+
 
 [[noreturn]] auto HandleConnProxy(void *server) noexcept;
 
@@ -34,53 +36,65 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class Server {
   [[noreturn]] auto HandleConnection() noexcept;
   auto Reconnect() noexcept;
-  auto Ack() noexcept;
-  auto ReadAck() noexcept;
 
   friend auto HandleConnProxy(void *server) noexcept;
 
-  enum class sig : unsigned char {
-    READ,
-    SEND
-  };
+  public:
+    enum class sig : unsigned char {
+      READ,
+      SEND
+    };
 
-  enum class end : unsigned char {
-    CLIENT,
-    SERVER
-  };
-  auto StartMessage(end endpoint, std::vector<unsigned char> codeVec) noexcept;
+    enum class end : unsigned char {
+      CLIENT,
+      SERVER
+    };
 
-  const std::vector<unsigned char> ACK{
-    static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
-    static_cast<unsigned char>('\1')
-  };
-  const std::vector<std::string> MESSAGES{
-    std::string("ADDR"),
-    std::string("RADD"),
-    std::string("DATA")
-  };
+  private:
+    const std::vector<unsigned char> HANDSHAKE{
+      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+      static_cast<unsigned char>('\0')
+    };
+    const std::vector<unsigned char> ACK{
+      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+      static_cast<unsigned char>('\1')
+    };
+    const std::vector<unsigned char> NACK{
+      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+      static_cast<unsigned char>('\2')
+    };
 
-  int serverSocket = -1;
-  int clientSocket = -1;
-  bool connected = false;
-  int messageId = 0;
+    const std::vector<std::string> MESSAGES{"ADDR"s, "RADD"s, "DATA"s};
 
-  std::map<int, sig> signals;
-  std::mutex signalMutex;
-  std::condition_variable signalCv;
+    int serverSocket = -1;
+    int clientSocket = -1;
+    bool connected = false;
+    int messageId = 0;
 
-  std::map<int, std::vector<unsigned char>> inPackets;
-  std::mutex inPacketMutex;
-  std::condition_variable inPacketCv;
-  std::map<int, std::vector<unsigned char>> outPackets;
-  std::mutex outPacketMutex;
-  std::condition_variable outPacketCv;
-  std::map<int, std::size_t> lengths;
-  std::mutex lengthMutex;
+    std::map<int, sig> signals;
+    std::mutex signalMutex;
+    std::condition_variable signalCv;
+
+    std::map<int, std::vector<unsigned char>> inPackets;
+    std::mutex inPacketMutex;
+    std::condition_variable inPacketCv;
+    std::map<int, std::vector<unsigned char>> outPackets;
+    std::mutex outPacketMutex;
+    std::condition_variable outPacketCv;
+    std::map<int, std::size_t> lengths;
+    std::mutex lengthMutex;
 
   public:
     auto Init(unsigned short port) noexcept -> bool;
     auto Connect() noexcept -> bool;
-    auto Read(std::size_t length) noexcept -> std::vector<unsigned char>;
-    auto Send(std::vector<unsigned char> data) noexcept -> void;
+    auto Read(const std::size_t length) noexcept -> std::vector<unsigned char>;
+    auto Send(const std::vector<unsigned char> data) noexcept -> void;
+    auto Ack() noexcept -> void;
+    auto Nack() noexcept -> void;
+    auto ReadAck() noexcept -> bool;
+    auto StartMessage(end endpoint, std::string &code) noexcept -> bool;
+
+    std::map<unsigned char *, std::size_t> watched;
+    std::mutex watchedMutex;
+    std::condition_variable watchedCv;
 };

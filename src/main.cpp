@@ -23,8 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <nn/os.h>
 
-#include <string>
-
 #include <cstdlib>
 
 
@@ -77,6 +75,57 @@ constexpr auto PORT = 52617;
 }
 
 
+// Memory watcher thread
+[[noreturn]] auto WatchThread(void *serverPtr) noexcept {
+  auto *server = static_cast<Server *>(serverPtr);
+
+  // Watch the requested memory addresses
+  while (true) [[likely]] {
+    // Wait for data to be available
+    std::unique_lock<std::mutex> lock(server->watchedMutex);
+    server->watchedCv.wait(lock, [server] {
+      return !server->watched.empty();
+    });
+
+    // Read from each memory address
+    auto watched = std::map(server->watched);
+    lock.unlock();
+
+    for (const auto &[address, size] : watched) {
+      auto code = "DATA"s;
+
+      if (!server->StartMessage(Server::end::SERVER, code)) {
+        break;
+      }
+
+      // Send the address and size
+      server->Send(std::vector(
+        reinterpret_cast<const unsigned char *>(&address),
+        reinterpret_cast<const unsigned char *>(&address) + 8uz
+      ));
+      server->Send(std::vector(
+        reinterpret_cast<const unsigned char *>(&size),
+        reinterpret_cast<const unsigned char *>(&size) + 8uz
+      ));
+
+      if (!server->ReadAck()) {
+        break;
+      }
+
+      // Send the data
+      server->Send(std::vector(
+        reinterpret_cast<const unsigned char *>(address),
+        reinterpret_cast<const unsigned char *>(address) + size
+      ));
+
+      if (!server->ReadAck()) {
+        break;
+      }
+    }
+  }
+}
+
+
 // Network data thread
 auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   // Initialize the server
@@ -91,11 +140,74 @@ auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
     Yield();
   }
 
-  // TODO: Send meaningful data
-  std::string hello("Hello from Nintendo Switch!");
+  // Start the memory watcher thread
+  static nn::os::ThreadType watchThread;
+  constexpr auto STACK_SIZE = 0x80000uz;
+  constexpr auto ALIGNMENT = 0x1000uz;
+  auto *watchStack = aligned_alloc(ALIGNMENT, STACK_SIZE);
 
+  if (watchStack == nullptr) [[unlikely]] {
+    return;
+  }
+
+  constexpr auto PRIORITY = 16;
+
+  if (nn::os::CreateThread(
+    &watchThread, WatchThread, static_cast<void *>(&server), watchStack,
+    static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
+  ).IsFailure()) [[unlikely]] {
+    free(watchStack);
+    return;
+  }
+
+  nn::os::StartThread(&watchThread);
+
+  // Start processing messages
   while (true) [[likely]] {
-    server.Send(std::vector<unsigned char>(hello.begin(), hello.end()));
+    // Receive a message code
+    std::string code;
+    server.StartMessage(Server::end::CLIENT, code);
+
+    if (code == "ADDR"s) {
+      // ADDR - add address to watch
+      auto *address = *reinterpret_cast<unsigned char **>(
+        server.Read(8).data()
+      );
+      auto size = *reinterpret_cast<std::size_t *>(server.Read(8).data());
+
+      // Start watching the address or update its maximum size
+      {
+        const std::lock_guard<std::mutex> lock(server.watchedMutex);
+        server.watched[address] = size;
+      }
+
+      // Notify the watcher thread that data is available and acknowledge the
+      // message
+      server.watchedCv.notify_one();
+      server.Ack();
+    }
+    else if (code == "RADD"s) {
+      // RADD - stop watching address
+      auto *address = *reinterpret_cast<unsigned char **>(
+        server.Read(8).data()
+      );
+
+      // If the address is being watched, stop watching it
+      {
+        const std::lock_guard<std::mutex> lock(server.watchedMutex);
+        auto watchedAddr = server.watched.find(address);
+
+        if (watchedAddr != server.watched.end()) [[likely]] {
+          server.watched.erase(watchedAddr);
+          server.Ack();
+        }
+        else [[unlikely]] {
+          server.Nack();
+        }
+      }
+
+      server.watchedCv.notify_one();
+    }
   }
 }
 
@@ -129,6 +241,7 @@ extern "C" auto LinkCannon_init() noexcept {
     // Free the thread stacks if it fails
     free(eventStack);
     free(networkStack);
+
     return;
   }
 
@@ -139,4 +252,4 @@ extern "C" auto LinkCannon_init() noexcept {
 
 
 // Finalization function
-extern "C" auto LinkCannon_fini() noexcept {}
+extern "C" [[maybe_unused]] inline constexpr auto LinkCannon_fini() noexcept {}
