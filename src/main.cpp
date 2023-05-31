@@ -91,10 +91,10 @@ constexpr auto PORT = 52617;
     auto watched = std::map(server->watched);
     lock.unlock();
 
-    for (const auto &[address, size] : watched) {
+    for (const auto &[address, size] : watched) [[likely]] {
       auto code = "DATA"s;
 
-      if (!server->StartMessage(Server::end::SERVER, code)) {
+      if (!server->StartMessage(Server::end::SERVER, code)) [[unlikely]] {
         break;
       }
 
@@ -108,7 +108,7 @@ constexpr auto PORT = 52617;
         reinterpret_cast<const unsigned char *>(&size) + 8uz
       ));
 
-      if (!server->ReadAck()) {
+      if (!server->ReadAck()) [[unlikely]] {
         break;
       }
 
@@ -118,7 +118,7 @@ constexpr auto PORT = 52617;
         reinterpret_cast<const unsigned char *>(address) + size
       ));
 
-      if (!server->ReadAck()) {
+      if (!server->ReadAck()) [[unlikely]] {
         break;
       }
     }
