@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstring>
 
 
-constexpr auto PORT = 52617;
+constexpr auto PORT = static_cast<unsigned short>(52617);
 
 
 // Event caller thread
