@@ -17,6 +17,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+#define _GNU_SOURCE
+
 #include <utility>
 
 #define MODULE_NAME "Link Cannon"
@@ -33,4 +35,6 @@ struct ModuleName {
 };
 
 [[gnu::section(".nx-module-name")]]
-constexpr ModuleName moduleName{.nameSize = static_cast<int>(MODULE_NAME_SIZE), .name = MODULE_NAME};
+constexpr ModuleName moduleName{
+  .nameSize = static_cast<int>(MODULE_NAME_SIZE), .name = MODULE_NAME
+};

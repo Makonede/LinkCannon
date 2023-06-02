@@ -17,15 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#include <server.hpp>
+#define _GNU_SOURCE
 
-#include <utility.hpp>
+#include <server.hpp>
 
 #include <nn/nifm.h>
 #include <nn/os.h>
-#include <nn/socket.h>
 
+#include <fcntl.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 
 #include <algorithm>
 
@@ -75,7 +76,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
   }
 
   // Create a socket
-  serverSocket = nn::socket::Socket(AF_INET, SOCK_STREAM, 0);
+  serverSocket = nn::socket::Socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 
   if (serverSocket < 0) [[unlikely]] {
     nn::socket::Finalize();
@@ -117,19 +118,6 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 }
 
 
-// Reconnect to the client
-inline auto Server::Reconnect() noexcept {
-  // Close and reset the socket
-  nn::socket::Close(clientSocket);
-  clientSocket = -1;
-
-  // Wait for a new connection
-  do [[unlikely]] {
-    clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-  } while (clientSocket < 0);
-}
-
-
 // Start a message from the passed endpoint
 auto Server::StartMessage(
   const end endpoint, std::string &code
@@ -148,6 +136,7 @@ auto Server::StartMessage(
       }
 
       Ack();
+      break;
     }
 
     case end::SERVER: {
@@ -171,13 +160,24 @@ auto Server::StartMessage(
 
 
 // Wait for and accept incoming connections and receive and send data
-[[noreturn]] auto Server::HandleConnection() noexcept {
-  // Accept an incoming connection
-  do [[unlikely]] {
-    clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-  } while (clientSocket < 0);
+auto Server::HandleConnection() noexcept -> void {
+  // Wait for an incoming connection
+  Poll(end::SERVER);
+
+  // A connection has been made; accept it
+  clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+
+  // Set the client socket as non-blocking
+  auto flags = nn::socket::Fcntl(clientSocket, F_GETFL);
+  if (flags < 0) [[unlikely]] {
+    return;
+  }
+
+  nn::socket::Fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK);
 
   // Receive a handshake
+  Poll(end::CLIENT);
+
   std::vector<unsigned char> handshake(3uz);
   auto handshakeResult = nn::socket::Recv(
     clientSocket, static_cast<void *>(handshake.data()),
@@ -190,6 +190,7 @@ auto Server::StartMessage(
       Reconnect();
 
       // Retry the handshake
+      Poll(end::CLIENT);
       handshakeResult = nn::socket::Recv(
         clientSocket, static_cast<void *>(handshake.data()),
         static_cast<unsigned long long>(handshake.size()), 0
@@ -204,6 +205,7 @@ auto Server::StartMessage(
         Reconnect();
       }
 
+      Poll(end::CLIENT);
       handshakeResult = nn::socket::Recv(
         clientSocket, static_cast<void *>(handshake.data()),
         static_cast<unsigned long long>(handshake.size()), 0
@@ -216,6 +218,7 @@ auto Server::StartMessage(
     clientSocket, static_cast<const void *>(ACK.data()),
     static_cast<unsigned long long>(ACK.size()), 0
   );
+  Poll(end::CLIENT);
 
   while (ackResult <= 0) [[unlikely]] {
     if (!ackResult) [[likely]] {
@@ -226,6 +229,7 @@ auto Server::StartMessage(
       clientSocket, static_cast<const void *>(ACK.data()),
       static_cast<unsigned long long>(ACK.size()), 0
     );
+    Poll(end::CLIENT);
   }
 
   connected = true;
@@ -251,6 +255,7 @@ auto Server::StartMessage(
         auto length = lengthIt->second;
         std::vector<unsigned char> data(length);
 
+        Poll(end::CLIENT);
         auto result = nn::socket::Recv(
           clientSocket, static_cast<void *>(data.data()),
           static_cast<unsigned long long>(data.size()), 0
@@ -261,6 +266,7 @@ auto Server::StartMessage(
             Reconnect();
           }
 
+          Poll(end::CLIENT);
           result = nn::socket::Recv(
             clientSocket, static_cast<void *>(data.data()),
             static_cast<unsigned long long>(data.size()), 0
@@ -287,6 +293,7 @@ auto Server::StartMessage(
           clientSocket, static_cast<const void *>(data.data()),
           static_cast<unsigned long long>(data.size()), 0
         );
+        Poll(end::CLIENT);
 
         while (result <= 0) [[unlikely]] {
           if (!result) [[likely]] {
@@ -297,6 +304,7 @@ auto Server::StartMessage(
             clientSocket, static_cast<const void *>(data.data()),
             static_cast<unsigned long long>(data.size()), 0
           );
+          Poll(end::CLIENT);
         }
 
         // Remove packet from queue
@@ -310,12 +318,6 @@ auto Server::StartMessage(
       }
     }
   }
-}
-
-
-// void (*)(void *) proxy for HandleConnection
-[[noreturn]] inline auto HandleConnProxy(void *server) noexcept {
-  static_cast<Server *>(server)->HandleConnection();
 }
 
 

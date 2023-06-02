@@ -24,7 +24,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <controller/seadControllerMgr.h>
 
+#include <poll.h>
+
 
 namespace botw {
   extern unsigned char *Memory;
+}
+
+namespace nn {
+  namespace socket {
+    extern int Fcntl(int fd, int cmd, ...);
+    extern int Poll(pollfd *fds, unsigned long nfds, int timeout);
+  }
 }

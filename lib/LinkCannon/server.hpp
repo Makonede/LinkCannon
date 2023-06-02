@@ -19,6 +19,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <botw.hpp>
+#include <utility.hpp>
+
+#include <nn/socket.h>
+
 #include <condition_variable>
 #include <map>
 #include <mutex>
@@ -30,14 +35,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using namespace std::string_literals;
 
 
-[[noreturn]] auto HandleConnProxy(void *server) noexcept;
+inline auto HandleConnProxy(void *server) noexcept;
 
 
 class Server {
-  [[noreturn]] auto HandleConnection() noexcept;
-  auto Reconnect() noexcept;
+  auto HandleConnection() noexcept -> void;
 
-  friend auto HandleConnProxy(void *server) noexcept;
+  friend inline auto HandleConnProxy(void *server) noexcept;
 
   public:
     enum class sig : unsigned char {
@@ -51,6 +55,44 @@ class Server {
     };
 
   private:
+    inline auto Poll(end endpoint) noexcept {
+      int sock;
+
+      switch (endpoint) {
+        case end::CLIENT: {
+          sock = clientSocket;
+          break;
+        }
+
+        case end::SERVER: {
+          sock = serverSocket;
+        }
+      }
+
+      do [[unlikely]] {
+        Yield();
+
+        pollfd socketFd{.fd = sock, .events = static_cast<short>(POLLIN)};
+        if (nn::socket::Poll(
+          &socketFd, 1u, 0
+        ) > 0 && socketFd.revents & static_cast<short>(POLLIN)) [[likely]] {
+          return;
+        }
+      } while (true);
+    }
+
+    inline auto Reconnect() noexcept {
+      // Close and reset the socket
+      nn::socket::Close(clientSocket);
+      clientSocket = -1;
+
+      // Wait for a new connection
+      Poll(end::SERVER);
+
+      // A connection has been made; accept it
+      clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+    }
+
     const std::vector<unsigned char> HANDSHAKE{
       static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
       static_cast<unsigned char>('\0')
@@ -106,3 +148,8 @@ class Server {
     std::mutex watchedMutex;
     std::condition_variable watchedCv;
 };
+
+
+inline auto HandleConnProxy(void *server) noexcept {
+  static_cast<Server *>(server)->HandleConnection();
+}

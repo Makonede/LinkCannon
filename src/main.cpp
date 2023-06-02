@@ -17,9 +17,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+#define _GNU_SOURCE
+
 #include <controller.hpp>
 #include <server.hpp>
-#include <utility.hpp>
 
 #include <nn/os.h>
 
@@ -27,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cstring>
 
 
-constexpr auto PORT = static_cast<unsigned short>(52617);
+constexpr auto PORT = static_cast<unsigned short>(52617u);
 
 
 // Event caller thread
