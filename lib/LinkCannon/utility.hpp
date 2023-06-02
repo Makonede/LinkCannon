@@ -22,9 +22,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <nn/os.h>
 
 
-// Yield the thread and sleep for 1 μs
+// Yield the thread and sleep for 1 ds (default)
 // This allows other threads to work and prevents busy waiting while loops from
 // eating CPU cycles.
-inline auto Yield() noexcept {
-  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(1000ull));
+inline auto Yield(unsigned long long time = 100'000'000ull) noexcept {
+  nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(time));
 }
