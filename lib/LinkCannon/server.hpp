@@ -74,7 +74,7 @@ class Server {
 
         pollfd socketFd{.fd = sock, .events = static_cast<short>(POLLIN)};
         if (nn::socket::Poll(
-          &socketFd, 1u, 0
+          &socketFd, 1ul, 0
         ) > 0 && socketFd.revents & static_cast<short>(POLLIN)) [[likely]] {
           return;
         }

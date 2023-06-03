@@ -1,0 +1,49 @@
+{
+  "name": "linkcannon",
+  "version": "1.0.0",
+  "description": "Web client for LinkCannon",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Makonede/LinkCannon.git"
+  },
+  "author": "Makonede",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Makonede/LinkCannon/issues"
+  },
+  "homepage": "https://github.com/Makonede/LinkCannon#readme",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-regular-svg-icons": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@types/eslint": "^8.40.0",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "20.2.5",
+    "@types/postcss-import": "^14.0.0",
+    "@types/react": "18.2.8",
+    "@types/react-dom": "18.2.4",
+    "eslint": "8.41.0",
+    "eslint-config-next": "13.4.4",
+    "futil": "^1.76.0",
+    "lodash": "^4.17.21",
+    "next": "13.4.4",
+    "postcss": "8.4.24",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tailwindcss": "3.3.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "10.4.14",
+    "postcss-import": "^15.1.0",
+    "postcss-preset-env": "^8.4.2",
+    "typescript": "5.1.3"
+  }
+}
