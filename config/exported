@@ -1,7 +1,7 @@
 {
     global:
-        linkcannon_init;
-        linkcannon_fini;
+        LinkCannon_init;
+        LinkCannon_fini;
 
     local: *;
 };  
