@@ -3,7 +3,7 @@
 	url = https://github.com/open-ead/sead
 [submodule "lib/nnheaders"]
 	path = lib/nnheaders
-	url = https://github.com/open-ead/nnheaders
+	url = https://github.com/Makonede/nnheaders
 [submodule "tools/botw-link"]
 	path = tools/botw-link
 	url = https://github.com/Makonede/botw-link
