@@ -32,7 +32,8 @@ mkdir -p $RELEASE_PATH/exefs
 cp -Rf build/LinkCannon.nso $RELEASE_PATH/exefs/subsdk9
 cp -Rf build/app.npdm $RELEASE_PATH/exefs/main.npdm
 cp -Rf romfs/ $RELEASE_PATH/
-python3 patch.py
+chmod +x patch.py
+./patch.py
 cp -Rf patched/* $RELEASE_PATH/romfs
 
 set +x
