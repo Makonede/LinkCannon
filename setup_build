@@ -17,5 +17,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-mkdir -p dump/Pack
-mkdir -p dump/System/Resource
+mkdir -p dump/Pack dump/System/Resource
