@@ -25,11 +25,9 @@ python3 -m pip install -U setuptools
 python3 -m pip install -U wheel
 python3 -m pip install -Ur tools/botw-link/requirements.txt
 python3 -m pip install -U vidua
-rm -rf build/
-mkdir build/
+rm -rf build/*
 python3 tools/botw-link config/botw-link.toml -cvV 160
-rm -rf release/
-rm -rf patched/
+rm -rf patched/ release/
 mkdir -p $RELEASE_PATH/exefs
 cp -Rf build/LinkCannon.nso $RELEASE_PATH/exefs/subsdk9
 cp -Rf build/app.npdm $RELEASE_PATH/exefs/main.npdm
