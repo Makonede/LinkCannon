@@ -1,1 +1,3 @@
 * text=auto
+compile linguist-language=Shell
+setup_build linguist-language=Shell
