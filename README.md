@@ -19,8 +19,7 @@ from Breath of the Wild 1.6.0
 To install Link Cannon:
 
 - Download the [latest release](https://github.com/Makonede/LinkCannon/releases/latest)'s
-`.zip` file (alternatively, the `.tar.xz` file if on UNIX) and extract it to your
-PC.
+`.zip` file (alternatively, the `.tar.xz` file if on UNIX) and extract it.
 - Place your dumps of `Bootup.pack` and `Bootup_USen.pack` in the `dump/Pack` folder
 in the folder that you extracted the `.zip` (or `.tar.xz`) to — the folder also
 containing `patch.py`, `patches`, and `content`. Place your dump of
