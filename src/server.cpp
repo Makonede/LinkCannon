@@ -130,8 +130,8 @@ auto Server::StartMessage(
 
       // Check if the code exists
       if (std::find(
-        MESSAGES.begin(), MESSAGES.end(), code
-      ) == MESSAGES.end()) [[unlikely]] {
+        CLIENT_MESSAGES.begin(), CLIENT_MESSAGES.end(), code
+      ) == CLIENT_MESSAGES.end()) [[unlikely]] {
         return false;
       }
 
@@ -142,8 +142,8 @@ auto Server::StartMessage(
     case end::SERVER: {
       // Check if the code exists
       if (std::find(
-        MESSAGES.begin(), MESSAGES.end(), code
-      ) == MESSAGES.end()) [[unlikely]] {
+        SERVER_MESSAGES.begin(), SERVER_MESSAGES.end(), code
+      ) == SERVER_MESSAGES.end()) [[unlikely]] {
         return false;
       }
 
