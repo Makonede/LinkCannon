@@ -106,7 +106,8 @@ class Server {
       static_cast<unsigned char>('\2')
     };
 
-    const std::vector<std::string> MESSAGES{"ADDR"s, "RADD"s, "DATA"s};
+    const std::vector<std::string> CLIENT_MESSAGES{"ADDR"s, "RADD"s, "DATA"s};
+    const std::vector<std::string> SERVER_MESSAGES{"DATA"s};
 
     int serverSocket = -1;
     int clientSocket = -1;
