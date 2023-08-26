@@ -37,7 +37,10 @@ chmod +x patch.py
 cp -Rf patched/* $RELEASE_PATH/romfs
 
 set +x
-echo
-echo Build complete. To install, copy the contents of the release folder onto the
-echo root of your microSD card.
+cat <<EOF
+
+Build complete. To install, copy the contents of the release folder onto the
+root of your microSD card.
+EOF
+
 read -n1 -r -p "Press any key to continue..."
