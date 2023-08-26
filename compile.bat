@@ -36,12 +36,15 @@ md %RELEASE_PATH%\exefs || exit /b
 md %RELEASE_PATH%\romfs || exit /b
 copy build\LinkCannon.nso %RELEASE_PATH%\exefs\subsdk9 || exit /b
 copy build\app.npdm %RELEASE_PATH%\exefs\main.npdm || exit /b
-robocopy romfs %RELEASE_PATH%\romfs /e /mt || if errorlevel 8 exit /b else cmd /c "exit /b 0"
+robocopy romfs %RELEASE_PATH%\romfs /e /mt^
+ || if errorlevel 8 exit /b else cmd /c "exit /b 0"
 py -3 patch.py || exit /b
-robocopy patched %RELEASE_PATH%\romfs /e /mt || if errorlevel 8 exit /b else cmd /c "exit /b 0"
+robocopy patched %RELEASE_PATH%\romfs /e /mt^
+ || if errorlevel 8 exit /b else cmd /c "exit /b 0"
 
 @echo off
 echo. || exit /b
-echo Build complete. To install, copy the contents of the release folder onto the || exit /b
+echo Build complete. To install, copy the contents of the release folder onto^
+ the || exit /b
 echo root of your microSD card. || exit /b
 pause || exit /b
