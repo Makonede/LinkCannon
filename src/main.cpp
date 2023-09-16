@@ -266,4 +266,4 @@ extern "C" constexpr auto LinkCannon_init() noexcept {
 
 
 // Finalization function
-extern "C" [[maybe_unused]] inline constexpr auto LinkCannon_fini() noexcept {}
+[[maybe_unused]] extern "C" inline constexpr auto LinkCannon_fini() noexcept {}

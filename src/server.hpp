@@ -32,7 +32,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
 
-using namespace std::string_literals;
+using namespace std::literals;
 
 
 inline auto HandleConnProxy(void *server) noexcept;

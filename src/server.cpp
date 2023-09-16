@@ -64,7 +64,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 
   // Request a network interface
   nn::nifm::SubmitNetworkRequest();
-  while (nn::nifm::IsNetworkRequestOnHold()) {
+  while (nn::nifm::IsNetworkRequestOnHold()) [[unlikely]] {
     Yield();
   }
 
