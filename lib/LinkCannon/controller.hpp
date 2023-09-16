@@ -51,7 +51,7 @@ enum class btn : unsigned int {
 };
 
 
-inline btn operator|(btn lhs, btn rhs) noexcept {
+inline constexpr btn operator|(btn lhs, btn rhs) noexcept {
   return static_cast<btn>(
     static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs)
   );

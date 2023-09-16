@@ -32,7 +32,9 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
 
 
 // Event caller thread
-[[noreturn]] auto EventThread([[maybe_unused]] auto *unused) noexcept {
+[[noreturn]] constexpr auto EventThread(
+  [[maybe_unused]] auto *unused
+) noexcept {
   // Wait for the event manager instance
   ksys::evt::Manager *eventManager = nullptr;
   do [[unlikely]] {
@@ -128,7 +130,7 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
 
 
 // Network data thread
-auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
+constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   // Initialize the server
   Server server;
 
@@ -225,9 +227,9 @@ auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
 
 // Initialization function (entrypoint)
-extern "C" auto LinkCannon_init() noexcept {
-  static nn::os::ThreadType eventThread;
-  static nn::os::ThreadType networkThread;
+extern "C" constexpr auto LinkCannon_init() noexcept {
+  nn::os::ThreadType eventThread;
+  nn::os::ThreadType networkThread;
 
   // Allocate memory for the thread stacks
   constexpr auto STACK_SIZE = 0x80000uz;
