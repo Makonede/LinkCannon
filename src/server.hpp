@@ -19,18 +19,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <botw.hpp>
-#include <utility.hpp>
+import std.compat;
 
 #include <nn/socket.h>
 
-#include <condition_variable>
-#include <map>
-#include <mutex>
-#include <string>
-#include <vector>
-
-#include <cstddef>
+#include <botw.hpp>
+#include <utility.hpp>
 
 using namespace std::literals;
 
