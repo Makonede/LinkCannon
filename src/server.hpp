@@ -74,9 +74,9 @@ class Server {
 
       do [[unlikely]] {
         Yield();
-      } while (nn::socket::Poll(
+      } while (!(nn::socket::Poll(
         &socketFd, 1ul, 0
-      ) <= 0 || !(socketFd.revents & READY));
+      ) > 0 && socketFd.revents & READY));
     }
 
     inline auto Reconnect() noexcept {
