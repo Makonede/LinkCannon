@@ -24,8 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <nn/os.h>
 
-#include <cstdlib>
-#include <cstring>
+import std.compat;
 
 
 constexpr auto PORT = static_cast<unsigned short>(52617u);
