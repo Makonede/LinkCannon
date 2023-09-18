@@ -19,18 +19,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define _GNU_SOURCE
 
-#include <server.hpp>
-
-#include <nn/nifm.h>
-#include <nn/os.h>
+import std.compat;
 
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#include <algorithm>
+#include <nn/nifm.h>
+#include <nn/os.h>
 
-#include <cstdlib>
+#include <server.hpp>
 
 
 // Initialize the server
