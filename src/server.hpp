@@ -69,16 +69,12 @@ class Server {
         }
       }
 
+      pollfd socketFd{.fd = sock, .events = static_cast<short>(POLLIN)};
       do [[unlikely]] {
         Yield();
-
-        pollfd socketFd{.fd = sock, .events = static_cast<short>(POLLIN)};
-        if (nn::socket::Poll(
-          &socketFd, 1ul, 0
-        ) > 0 && socketFd.revents & static_cast<short>(POLLIN)) [[likely]] {
-          return;
-        }
-      } while (true);
+      } while (nn::socket::Poll(
+        &socketFd, 1ul, 0
+      ) <= 0 || !(socketFd.revents & static_cast<short>(POLLIN)));
     }
 
     inline auto Reconnect() noexcept {
