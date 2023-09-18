@@ -19,12 +19,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define _GNU_SOURCE
 
-#include <controller.hpp>
-#include <server.hpp>
+import std.compat;
 
 #include <nn/os.h>
 
-import std.compat;
+#include <controller.hpp>
+#include <server.hpp>
 
 
 constexpr auto PORT = static_cast<unsigned short>(52617u);
