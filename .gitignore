@@ -6,4 +6,5 @@
 /patched/
 /config/160.yaml
 /config/symbols.ld
+/gcm.cache/
 **/*.bak
