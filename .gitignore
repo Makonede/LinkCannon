@@ -8,3 +8,4 @@
 /config/symbols.ld
 /gcm.cache/
 **/*.bak
+**/.venv/

@@ -18,3 +18,28 @@
 
 
 mkdir -p dump/Pack dump/System/Resource
+rm -rf gcm.cache/*
+
+$DEVKITPRO/aarch64-none-elf-g++ -c -fmodules-ts -x c++-system-header \
+  -std=gnu++2b algorithm any array atomic barrier bit bitset cassert cctype \
+  cerrno cfenv cfloat charconv chrono cinttypes climits clocale cmath compare \
+  complex concepts condition_variable coroutine csetjmp csignal cstdarg \
+  cstddef cstdint cstdio cstdlib cstring ctime cuchar cwchar cwctype deque \
+  exception execution expected filesystem flat_map flat_set format \
+  forward_list fstream functional future generator hazard_pointer \
+  initializer_list iomanip ios iosfwd iostream istream iterator latch limits \
+  list locale map mdspan memory memory_resource mutex new numbers numeric \
+  optional ostream print queue random ranges ratio rcu regex scoped_allocator \
+  semaphore set shared_mutex source_location span spanstream sstream stack \
+  stacktrace stdexcept stdfloat stop_token streambuf string string_view \
+  syncstream system_error text_encoding thread tuple type_traits typeindex \
+  typeinfo unordered_map unordered_set utility valarray variant vector version \
+  || true
+
+[ -d .venv ] || python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -U pip
+python3 -m pip install -U wheel
+python3 -m pip install -U setuptools
+python3 -m pip install -Ur tools/botw-link/requirements.txt
+python3 -m pip install -U vidua

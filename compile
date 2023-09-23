@@ -41,6 +41,7 @@ cat <<EOF
 
 Build complete. To install, copy the contents of the release folder onto the
 root of your microSD card.
+
 EOF
 
 read -n1 -r -p "Press any key to continue..."

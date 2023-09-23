@@ -19,7 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define _GNU_SOURCE
 
-import std.compat;
+import <cstdlib>;
+import <cstring>;
 
 #include <nn/os.h>
 

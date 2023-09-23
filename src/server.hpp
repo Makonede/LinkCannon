@@ -19,7 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-import std.compat;
+import <condition_variable>;
+import <map>;
+import <mutex>;
+import <string>;
+import <vector>;
+
+import <cstddef>;
 
 #include <nn/socket.h>
 
