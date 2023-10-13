@@ -17,11 +17,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-export module utility;
+module;
 
 #define _GNU_SOURCE
 
 #include <nn/os.h>
+
+export module utility;
 
 
 // Yield the thread and sleep for 1 ds (default)

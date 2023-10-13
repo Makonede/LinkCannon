@@ -17,10 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-export module server;
-
-export import botw;
-export import utility;
+module;
 
 #define _GNU_SOURCE
 
@@ -41,6 +38,11 @@ export import utility;
 #include <nn/nifm.h>
 #include <nn/os.h>
 #include <nn/socket.h>
+
+export module server;
+
+export import botw;
+export import utility;
 
 using namespace std::literals;
 

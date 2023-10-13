@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-export module botw;
+module;
 
 #define _GNU_SOURCE
 
@@ -25,6 +25,8 @@ export module botw;
 #include <KingSystem/Event/evtMetadata.h>
 
 #include <controller/seadControllerMgr.h>
+
+export module botw;
 
 
 export namespace botw {
