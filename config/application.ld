@@ -1,16 +1,14 @@
 OUTPUT_FORMAT(elf64-littleaarch64)
 OUTPUT_ARCH(aarch64)
 
-PHDRS
-{
+PHDRS {
   text PT_LOAD FLAGS(5);
   rodata PT_LOAD FLAGS(4);
   data PT_LOAD FLAGS(6);
   dynamic PT_DYNAMIC;
 }
 
-SECTIONS
-{
+SECTIONS {
   PROVIDE(__start__ = 0x0);
   . = __start__;
   __code_start__ = .;
@@ -42,10 +40,10 @@ SECTIONS
   } :rodata
 
   /* All the symbols needed for relocation lookup */
-  .hash     : { *(.hash) } :rodata
+  .hash : { *(.hash) } :rodata
   .gnu.hash : { *(.gnu.hash) } :rodata
-  .dynsym   : { *(.dynsym .dynsym.*) } :rodata
-  .dynstr   : { *(.dynstr .dynstr.*) } :rodata
+  .dynsym : { *(.dynsym .dynsym.*) } :rodata
+  .dynstr : { *(.dynstr .dynstr.*) } :rodata
 
   __rel_dyn_start__ = .;
   .rel.dyn : { *(.rel.dyn) } :rodata
@@ -56,11 +54,11 @@ SECTIONS
   __rela_dyn_end__ = .;
 
   __rel_plt_start__ = .;
-  .rel.plt        : { *(.rel.plt) } :rodata
+  .rel.plt : { *(.rel.plt) } :rodata
   __rel_plt_end__ = .;
 
   __rela_plt_start__ = .;
-  .rela.plt       : { *(.rela.plt) } :rodata
+  .rela.plt : { *(.rela.plt) } :rodata
   __rela_plt_end__ = .;
 
   /* All exception handling sections */
