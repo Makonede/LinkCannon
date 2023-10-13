@@ -17,15 +17,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+import controller;
+import server;
+
 #define _GNU_SOURCE
 
 #include <cstdlib>
 #include <cstring>
 
 #include <nn/os.h>
-
-import controller;
-import server;
 
 
 constexpr auto PORT = static_cast<unsigned short>(52617u);

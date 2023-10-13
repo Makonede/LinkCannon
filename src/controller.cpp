@@ -19,9 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export module controller;
 
-#define _GNU_SOURCE
-
 export import botw;
+
+#define _GNU_SOURCE
 
 
 export enum class btn : unsigned int {
