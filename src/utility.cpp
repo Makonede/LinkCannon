@@ -1,5 +1,5 @@
 /*
-utility.hpp - Header file for commonly used utilities.
+utility.cpp - C++ file for commonly used utilities.
 Copyright (C) 2023  Makonede
 
 This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#pragma once
+export module utility;
+
+#define _GNU_SOURCE
 
 #include <nn/os.h>
 
@@ -25,6 +27,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // Yield the thread and sleep for 1 ds (default)
 // This allows other threads to work and prevents busy waiting while loops from
 // eating CPU cycles.
-inline auto Yield(unsigned long long time = 100'000'000ull) noexcept {
+export inline auto Yield(unsigned long long time = 100'000'000ull) noexcept {
   nn::os::SleepThread(nn::TimeSpan::FromNanoSeconds(time));
 }

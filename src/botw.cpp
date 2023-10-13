@@ -17,12 +17,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+export module botw;
+
 #define _GNU_SOURCE
 
-#include <botw.hpp>
+#include <KingSystem/Event/evtManager.h>
+#include <KingSystem/Event/evtMetadata.h>
+
+#include <controller/seadControllerMgr.h>
 
 
-namespace ksys::evt {
+export namespace botw {
+  extern unsigned char *Memory;
+}
+
+export namespace ksys::evt {
   Metadata::~Metadata() {
     if (mOrderParam) {
       delete mOrderParam;

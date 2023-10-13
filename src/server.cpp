@@ -17,11 +17,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+export module server;
+
 #define _GNU_SOURCE
 
-import <algorithm>;
+#include <algorithm>
+#include <condition_variable>
+#include <map>
+#include <mutex>
+#include <string>
+#include <vector>
 
-import <cstdlib>;
+#include <cstddef>
+#include <cstdlib>
 
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -29,398 +37,515 @@ import <cstdlib>;
 
 #include <nn/nifm.h>
 #include <nn/os.h>
+#include <nn/socket.h>
 
-#include <server.hpp>
+export import botw;
+export import utility;
 
-
-// Initialize the server
-auto Server::Init(unsigned short port) noexcept -> bool {
-  // Initialize the Network Interface Module
-  if (nn::nifm::Initialize().IsFailure()) [[unlikely]] {
-    return false;
-  }
-
-  // Allocate memory for the socket pool
-  constexpr auto POOL_SIZE = 0x100000uz;
-  constexpr auto ALIGNMENT = 0x1000uz;
-  auto *pool = aligned_alloc(ALIGNMENT, POOL_SIZE);
-
-  if (pool == nullptr) [[unlikely]] {
-    return false;
-  }
-
-  // Initialize the sockets API
-  constexpr auto POOL_ALLOC_SIZE = 0x20000ull;
-  constexpr auto CONCURRENCY_LIMIT = 4;
-
-  if (nn::socket::Initialize(
-    pool, static_cast<unsigned long long>(POOL_SIZE), POOL_ALLOC_SIZE,
-    CONCURRENCY_LIMIT
-  ).IsFailure()) [[unlikely]] {
-    // Free the pool if it fails
-    free(pool);
-    return false;
-  }
-
-  // Request a network interface
-  nn::nifm::SubmitNetworkRequest();
-  while (nn::nifm::IsNetworkRequestOnHold()) [[unlikely]] {
-    Yield();
-  }
-
-  if (!nn::nifm::IsNetworkAvailable()) [[unlikely]] {
-    nn::socket::Finalize();
-    free(pool);
-
-    return false;
-  }
-
-  // Create a socket
-  serverSocket = nn::socket::Socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-
-  if (serverSocket < 0) [[unlikely]] {
-    nn::socket::Finalize();
-    free(pool);
-
-    return false;
-  }
-
-  // Bind to all available network interfaces
-  sockaddr_in address{
-    .sin_family = AF_INET, .sin_port = nn::socket::InetHtons(port)
-  };
-  nn::socket::InetAton(
-    "0.0.0.0", reinterpret_cast<nn::socket::InAddr *>(&address.sin_addr.s_addr)
-  );
-
-  if (nn::socket::Bind(
-    serverSocket, reinterpret_cast<sockaddr *>(&address), sizeof address
-  ) < 0) [[unlikely]] {
-    nn::socket::Close(serverSocket);
-    serverSocket = -1;
-    nn::socket::Finalize();
-    free(pool);
-
-    return false;
-  }
-
-  // Listen for incoming connections
-  if (nn::socket::Listen(serverSocket, 1) < 0) [[unlikely]] {
-    nn::socket::Close(serverSocket);
-    serverSocket = -1;
-    nn::socket::Finalize();
-    free(pool);
-
-    return false;
-  }
-
-  return true;
-}
+using namespace std::literals;
 
 
-// Start a message from the passed endpoint
-auto Server::StartMessage(
-  const end endpoint, std::string &code
-) noexcept -> bool {
-  switch (endpoint) {
-    case end::CLIENT: {
-      // Read the message code
-      auto codeVec = Read(4uz);
-      code = std::string(codeVec.begin(), codeVec.end());
+inline auto HandleConnProxy(void *server) noexcept;
 
-      // Check if the code exists
-      if (std::find(
-        CLIENT_MESSAGES.begin(), CLIENT_MESSAGES.end(), code
-      ) == CLIENT_MESSAGES.end()) [[unlikely]] {
-        return false;
-      }
 
-      Ack();
-      break;
+export class Server {
+  // Wait for and accept incoming connections and receive and send data
+  auto HandleConnection() noexcept -> void {
+    // Wait for an incoming connection
+    Poll(end::SERVER);
+
+    // A connection has been made; accept it
+    clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+
+    // Set the client socket as non-blocking
+    auto flags = nn::socket::Fcntl(clientSocket, F_GETFL);
+    if (flags < 0) [[unlikely]] {
+      return;
     }
 
-    case end::SERVER: {
-      // Check if the code exists
-      if (std::find(
-        SERVER_MESSAGES.begin(), SERVER_MESSAGES.end(), code
-      ) == SERVER_MESSAGES.end()) [[unlikely]] {
-        return false;
-      }
+    nn::socket::Fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK);
 
-      // Send the message code
-      Send(std::vector<unsigned char>(code.begin(), code.end()));
+    // Receive a handshake
+    Poll(end::CLIENT);
 
-      // Check if the client received the message
-      return ReadAck();
-    }
-  }
+    std::vector<unsigned char> handshake(3uz);
+    auto handshakeResult = nn::socket::Recv(
+      clientSocket, static_cast<void *>(handshake.data()),
+      static_cast<unsigned long long>(handshake.size()), 0
+    );
 
-  return false;
-}
-
-
-// Wait for and accept incoming connections and receive and send data
-auto Server::HandleConnection() noexcept -> void {
-  // Wait for an incoming connection
-  Poll(end::SERVER);
-
-  // A connection has been made; accept it
-  clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-
-  // Set the client socket as non-blocking
-  auto flags = nn::socket::Fcntl(clientSocket, F_GETFL);
-  if (flags < 0) [[unlikely]] {
-    return;
-  }
-
-  nn::socket::Fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK);
-
-  // Receive a handshake
-  Poll(end::CLIENT);
-
-  std::vector<unsigned char> handshake(3uz);
-  auto handshakeResult = nn::socket::Recv(
-    clientSocket, static_cast<void *>(handshake.data()),
-    static_cast<unsigned long long>(handshake.size()), 0
-  );
-
-  while (handshake != HANDSHAKE) [[unlikely]] {
-    if (handshakeResult > 0) [[unlikely]] {
-      // A proper handshake was not received
-      Reconnect();
-
-      // Retry the handshake
-      Poll(end::CLIENT);
-      handshakeResult = nn::socket::Recv(
-        clientSocket, static_cast<void *>(handshake.data()),
-        static_cast<unsigned long long>(handshake.size()), 0
-      );
-    }
-
-    while (handshakeResult <= 0) [[likely]] {
-      // result == 0: Client closed the connection
-      // result < 0: An error occurred
-      if (!handshakeResult) [[likely]] {
-        // Connection has been lost
+    while (handshake != HANDSHAKE) [[unlikely]] {
+      if (handshakeResult > 0) [[unlikely]] {
+        // A proper handshake was not received
         Reconnect();
+
+        // Retry the handshake
+        Poll(end::CLIENT);
+        handshakeResult = nn::socket::Recv(
+          clientSocket, static_cast<void *>(handshake.data()),
+          static_cast<unsigned long long>(handshake.size()), 0
+        );
       }
 
-      Poll(end::CLIENT);
-      handshakeResult = nn::socket::Recv(
-        clientSocket, static_cast<void *>(handshake.data()),
-        static_cast<unsigned long long>(handshake.size()), 0
-      );
-    }
-  }
+      while (handshakeResult <= 0) [[likely]] {
+        // result == 0: Client closed the connection
+        // result < 0: An error occurred
+        if (!handshakeResult) [[likely]] {
+          // Connection has been lost
+          Reconnect();
+        }
 
-  // Acknowledge the handshake
-  auto ackResult = nn::socket::Send(
-    clientSocket, static_cast<const void *>(ACK.data()),
-    static_cast<unsigned long long>(ACK.size()), 0
-  );
-  Poll(end::CLIENT);
-
-  while (ackResult <= 0) [[unlikely]] {
-    if (!ackResult) [[likely]] {
-      Reconnect();
+        Poll(end::CLIENT);
+        handshakeResult = nn::socket::Recv(
+          clientSocket, static_cast<void *>(handshake.data()),
+          static_cast<unsigned long long>(handshake.size()), 0
+        );
+      }
     }
 
-    ackResult = nn::socket::Send(
+    // Acknowledge the handshake
+    auto ackResult = nn::socket::Send(
       clientSocket, static_cast<const void *>(ACK.data()),
       static_cast<unsigned long long>(ACK.size()), 0
     );
     Poll(end::CLIENT);
-  }
 
-  connected = true;
+    while (ackResult <= 0) [[unlikely]] {
+      if (!ackResult) [[likely]] {
+        Reconnect();
+      }
 
-  while (true) [[likely]] {
-    // Wait for a signal
-    std::unique_lock<std::mutex> lock(signalMutex);
-    signalCv.wait(lock, [this] {
-      return !signals.empty();
-    });
+      ackResult = nn::socket::Send(
+        clientSocket, static_cast<const void *>(ACK.data()),
+        static_cast<unsigned long long>(ACK.size()), 0
+      );
+      Poll(end::CLIENT);
+    }
 
-    // Execute next signal
-    auto signalIt = signals.begin();
-    auto signal = signalIt->second;
-    auto currentMessageId = signalIt->first;
-    signals.erase(signalIt);
-    lock.unlock();
+    connected = true;
 
-    switch (signal) {
-      case sig::READ: {
-        // Receive data
-        auto lengthIt = lengths.find(currentMessageId);
-        auto length = lengthIt->second;
-        std::vector<unsigned char> data(length);
+    while (true) [[likely]] {
+      // Wait for a signal
+      std::unique_lock<std::mutex> lock(signalMutex);
+      signalCv.wait(lock, [this] {
+        return !signals.empty();
+      });
 
-        Poll(end::CLIENT);
-        auto result = nn::socket::Recv(
-          clientSocket, static_cast<void *>(data.data()),
-          static_cast<unsigned long long>(data.size()), 0
-        );
+      // Execute next signal
+      auto signalIt = signals.begin();
+      auto signal = signalIt->second;
+      auto currentMessageId = signalIt->first;
+      signals.erase(signalIt);
+      lock.unlock();
 
-        while (result <= 0) [[unlikely]] {
-          if (!result) [[likely]] {
-            Reconnect();
-          }
+      switch (signal) {
+        case sig::READ: {
+          // Receive data
+          auto lengthIt = lengths.find(currentMessageId);
+          auto length = lengthIt->second;
+          std::vector<unsigned char> data(length);
 
           Poll(end::CLIENT);
-          result = nn::socket::Recv(
+          auto result = nn::socket::Recv(
             clientSocket, static_cast<void *>(data.data()),
             static_cast<unsigned long long>(data.size()), 0
           );
-        }
 
-        // Add packet to queue
-        {
-          const std::lock_guard<std::mutex> lock(inPacketMutex);
-          inPackets[currentMessageId] = data;
-        }
+          while (result <= 0) [[unlikely]] {
+            if (!result) [[likely]] {
+              Reconnect();
+            }
 
-        // Notify Server::Read to return
-        inPacketCv.notify_all();
-        break;
-      }
-
-      case sig::SEND: {
-        // Send data
-        auto dataIt = outPackets.find(currentMessageId);
-        auto data = dataIt->second;
-
-        auto result = nn::socket::Send(
-          clientSocket, static_cast<const void *>(data.data()),
-          static_cast<unsigned long long>(data.size()), 0
-        );
-        Poll(end::CLIENT);
-
-        while (result <= 0) [[unlikely]] {
-          if (!result) [[likely]] {
-            Reconnect();
+            Poll(end::CLIENT);
+            result = nn::socket::Recv(
+              clientSocket, static_cast<void *>(data.data()),
+              static_cast<unsigned long long>(data.size()), 0
+            );
           }
 
-          result = nn::socket::Send(
+          // Add packet to queue
+          {
+            const std::lock_guard<std::mutex> lock(inPacketMutex);
+            inPackets[currentMessageId] = data;
+          }
+
+          // Notify Server::Read to return
+          inPacketCv.notify_all();
+          break;
+        }
+
+        case sig::SEND: {
+          // Send data
+          auto dataIt = outPackets.find(currentMessageId);
+          auto data = dataIt->second;
+
+          auto result = nn::socket::Send(
             clientSocket, static_cast<const void *>(data.data()),
             static_cast<unsigned long long>(data.size()), 0
           );
           Poll(end::CLIENT);
-        }
 
-        // Remove packet from queue
-        {
-          const std::lock_guard<std::mutex> lock(outPacketMutex);
-          outPackets.erase(dataIt);
-        }
+          while (result <= 0) [[unlikely]] {
+            if (!result) [[likely]] {
+              Reconnect();
+            }
 
-        // Notify Server::Send to return
-        outPacketCv.notify_all();
+            result = nn::socket::Send(
+              clientSocket, static_cast<const void *>(data.data()),
+              static_cast<unsigned long long>(data.size()), 0
+            );
+            Poll(end::CLIENT);
+          }
+
+          // Remove packet from queue
+          {
+            const std::lock_guard<std::mutex> lock(outPacketMutex);
+            outPackets.erase(dataIt);
+          }
+
+          // Notify Server::Send to return
+          outPacketCv.notify_all();
+        }
       }
     }
   }
-}
 
 
-// Start the connection handler
-auto Server::Connect() noexcept -> bool {
-  if (connected) [[unlikely]] {
-    return true;
-  }
+  friend inline auto HandleConnProxy(void *server) noexcept;
 
-  static nn::os::ThreadType serverThread;
+  public:
+    enum class sig : unsigned char {
+      READ,
+      SEND
+    };
 
-  // Allocate memory for the server thread stack
-  constexpr auto STACK_SIZE = 0x80000uz;
-  constexpr auto ALIGNMENT = 0x1000uz;
-  auto *stack = aligned_alloc(ALIGNMENT, STACK_SIZE);
+    enum class end : unsigned char {
+      CLIENT,
+      SERVER
+    };
 
-  if (stack == nullptr) [[unlikely]] {
-    return false;
-  }
+  private:
+    inline auto Poll(end endpoint) noexcept {
+      int sock;
 
-  // Attempt to create the server thread
-  constexpr auto PRIORITY = 16;
+      switch (endpoint) {
+        case end::CLIENT: {
+          sock = clientSocket;
+          break;
+        }
 
-  if (nn::os::CreateThread(
-    &serverThread, HandleConnProxy, static_cast<void *>(this), stack,
-    static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
-  ).IsFailure()) [[unlikely]] {
-    // Free the thread stack if it fails
-    free(stack);
-    return false;
-  }
+        case end::SERVER: {
+          sock = serverSocket;
+        }
+      }
 
-  // Start the thread
-  nn::os::StartThread(&serverThread);
+      constexpr auto READY = static_cast<short>(POLLIN);
+      pollfd socketFd{.fd = sock, .events = READY};
 
-  // Wait for a connection
-  do [[unlikely]] {
-    Yield();
-  } while (!connected);
+      do [[unlikely]] {
+        Yield();
+      } while (!(nn::socket::Poll(
+        &socketFd, 1ul, 0
+      ) > 0 && socketFd.revents & READY));
+    }
 
-  return true;
-}
+    inline auto Reconnect() noexcept {
+      // Close and reset the socket
+      nn::socket::Close(clientSocket);
+      clientSocket = -1;
+
+      // Wait for a new connection
+      Poll(end::SERVER);
+
+      // A connection has been made; accept it
+      clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+    }
+
+    const std::vector<unsigned char> HANDSHAKE{
+      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+      static_cast<unsigned char>('\0')
+    };
+    const std::vector<unsigned char> ACK{
+      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+      static_cast<unsigned char>('\1')
+    };
+    const std::vector<unsigned char> NACK{
+      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
+      static_cast<unsigned char>('\2')
+    };
+
+    const std::vector<std::string> CLIENT_MESSAGES{"ADDR"s, "RADD"s, "DATA"s};
+    const std::vector<std::string> SERVER_MESSAGES{"DATA"s};
+
+    int serverSocket = -1;
+    int clientSocket = -1;
+    bool connected = false;
+    int messageId = 0;
+
+    std::map<int, sig> signals;
+    std::mutex signalMutex;
+    std::condition_variable signalCv;
+
+    std::map<int, std::vector<unsigned char>> inPackets;
+    std::mutex inPacketMutex;
+    std::condition_variable inPacketCv;
+    std::map<int, std::vector<unsigned char>> outPackets;
+    std::mutex outPacketMutex;
+    std::condition_variable outPacketCv;
+    std::map<int, std::size_t> lengths;
+    std::mutex lengthMutex;
+
+  public:
+    // Initialize the server
+    auto Init(unsigned short port) noexcept -> bool {
+      // Initialize the Network Interface Module
+      if (nn::nifm::Initialize().IsFailure()) [[unlikely]] {
+        return false;
+      }
+
+      // Allocate memory for the socket pool
+      constexpr auto POOL_SIZE = 0x100000uz;
+      constexpr auto ALIGNMENT = 0x1000uz;
+      auto *pool = aligned_alloc(ALIGNMENT, POOL_SIZE);
+
+      if (pool == nullptr) [[unlikely]] {
+        return false;
+      }
+
+      // Initialize the sockets API
+      constexpr auto POOL_ALLOC_SIZE = 0x20000ull;
+      constexpr auto CONCURRENCY_LIMIT = 4;
+
+      if (nn::socket::Initialize(
+        pool, static_cast<unsigned long long>(POOL_SIZE), POOL_ALLOC_SIZE,
+        CONCURRENCY_LIMIT
+      ).IsFailure()) [[unlikely]] {
+        // Free the pool if it fails
+        free(pool);
+        return false;
+      }
+
+      // Request a network interface
+      nn::nifm::SubmitNetworkRequest();
+      while (nn::nifm::IsNetworkRequestOnHold()) [[unlikely]] {
+        Yield();
+      }
+
+      if (!nn::nifm::IsNetworkAvailable()) [[unlikely]] {
+        nn::socket::Finalize();
+        free(pool);
+
+        return false;
+      }
+
+      // Create a socket
+      serverSocket = nn::socket::Socket(
+        AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0
+      );
+
+      if (serverSocket < 0) [[unlikely]] {
+        nn::socket::Finalize();
+        free(pool);
+
+        return false;
+      }
+
+      // Bind to all available network interfaces
+      sockaddr_in address{
+        .sin_family = AF_INET, .sin_port = nn::socket::InetHtons(port)
+      };
+      nn::socket::InetAton("0.0.0.0", reinterpret_cast<nn::socket::InAddr *>(
+        &address.sin_addr.s_addr
+      ));
+
+      if (nn::socket::Bind(
+        serverSocket, reinterpret_cast<sockaddr *>(&address), sizeof address
+      ) < 0) [[unlikely]] {
+        nn::socket::Close(serverSocket);
+        serverSocket = -1;
+        nn::socket::Finalize();
+        free(pool);
+
+        return false;
+      }
+
+      // Listen for incoming connections
+      if (nn::socket::Listen(serverSocket, 1) < 0) [[unlikely]] {
+        nn::socket::Close(serverSocket);
+        serverSocket = -1;
+        nn::socket::Finalize();
+        free(pool);
+
+        return false;
+      }
+
+      return true;
+    }
 
 
-// Receive data from the client
-auto Server::Read(
-  const std::size_t length
-) noexcept -> std::vector<unsigned char> {
-  auto currentMessageId = ++messageId;
+    // Start the connection handler
+    auto Connect() noexcept -> bool {
+      if (connected) [[unlikely]] {
+        return true;
+      }
 
-  // Set the length
-  {
-    const std::lock_guard<std::mutex> lock(lengthMutex);
-    lengths[currentMessageId] = length;
-  }
+      static nn::os::ThreadType serverThread;
 
-  // Broadcast the signal
-  {
-    const std::lock_guard<std::mutex> lock(signalMutex);
-    signals[currentMessageId] = sig::READ;
-  }
+      // Allocate memory for the server thread stack
+      constexpr auto STACK_SIZE = 0x80000uz;
+      constexpr auto ALIGNMENT = 0x1000uz;
+      auto *stack = aligned_alloc(ALIGNMENT, STACK_SIZE);
 
-  signalCv.notify_one();
+      if (stack == nullptr) [[unlikely]] {
+        return false;
+      }
 
-  // Wait for a response
-  std::unique_lock<std::mutex> lock(inPacketMutex);
-  inPacketCv.wait(lock, [this, currentMessageId] {
-    return inPackets.contains(currentMessageId);
-  });
+      // Attempt to create the server thread
+      constexpr auto PRIORITY = 16;
 
-  // Return the response
-  auto packetIt = inPackets.find(currentMessageId);
-  auto packet = packetIt->second;
-  inPackets.erase(packetIt);
-  lock.unlock();
+      if (nn::os::CreateThread(
+        &serverThread, HandleConnProxy, static_cast<void *>(this), stack,
+        static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
+      ).IsFailure()) [[unlikely]] {
+        // Free the thread stack if it fails
+        free(stack);
+        return false;
+      }
 
-  return packet;
-}
+      // Start the thread
+      nn::os::StartThread(&serverThread);
+
+      // Wait for a connection
+      do [[unlikely]] {
+        Yield();
+      } while (!connected);
+
+      return true;
+    }
 
 
-// Send data to the client
-auto Server::Send(const std::vector<unsigned char> data) noexcept -> void {
-  auto currentMessageId = ++messageId;
+    // Receive data from the client
+    auto Read(
+      const std::size_t length
+    ) noexcept -> std::vector<unsigned char> {
+      auto currentMessageId = ++messageId;
 
-  // Set the data
-  {
-    const std::lock_guard<std::mutex> lock(outPacketMutex);
-    outPackets[currentMessageId] = data;
-  }
+      // Set the length
+      {
+        const std::lock_guard<std::mutex> lock(lengthMutex);
+        lengths[currentMessageId] = length;
+      }
 
-  // Broadcast the signal
-  {
-    const std::lock_guard<std::mutex> lock(signalMutex);
-    signals[currentMessageId] = sig::SEND;
-  }
+      // Broadcast the signal
+      {
+        const std::lock_guard<std::mutex> lock(signalMutex);
+        signals[currentMessageId] = sig::READ;
+      }
 
-  signalCv.notify_one();
+      signalCv.notify_one();
 
-  // Wait for the packet to be sent
-  std::unique_lock<std::mutex> lock(outPacketMutex);
-  outPacketCv.wait(lock, [this, currentMessageId] {
-    return !outPackets.contains(currentMessageId);
-  });
+      // Wait for a response
+      std::unique_lock<std::mutex> lock(inPacketMutex);
+      inPacketCv.wait(lock, [this, currentMessageId] {
+        return inPackets.contains(currentMessageId);
+      });
 
-  lock.unlock();
+      // Return the response
+      auto packetIt = inPackets.find(currentMessageId);
+      auto packet = packetIt->second;
+      inPackets.erase(packetIt);
+      lock.unlock();
+
+      return packet;
+    }
+
+
+    // Send data to the client
+    auto Send(const std::vector<unsigned char> data) noexcept -> void {
+      auto currentMessageId = ++messageId;
+
+      // Set the data
+      {
+        const std::lock_guard<std::mutex> lock(outPacketMutex);
+        outPackets[currentMessageId] = data;
+      }
+
+      // Broadcast the signal
+      {
+        const std::lock_guard<std::mutex> lock(signalMutex);
+        signals[currentMessageId] = sig::SEND;
+      }
+
+      signalCv.notify_one();
+
+      // Wait for the packet to be sent
+      std::unique_lock<std::mutex> lock(outPacketMutex);
+      outPacketCv.wait(lock, [this, currentMessageId] {
+        return !outPackets.contains(currentMessageId);
+      });
+
+      lock.unlock();
+    }
+
+
+    inline auto Ack() noexcept -> void {
+      Send(ACK);
+    }
+    inline auto Nack() noexcept -> void {
+      Send(NACK);
+    }
+    inline auto ReadAck() noexcept -> bool {
+      return Read(3uz) == ACK;
+    }
+
+
+    // Start a message from the passed endpoint
+    auto StartMessage(
+      const end endpoint, std::string &code
+    ) noexcept -> bool {
+      switch (endpoint) {
+        case end::CLIENT: {
+          // Read the message code
+          auto codeVec = Read(4uz);
+          code = std::string(codeVec.begin(), codeVec.end());
+
+          // Check if the code exists
+          if (std::find(
+            CLIENT_MESSAGES.begin(), CLIENT_MESSAGES.end(), code
+          ) == CLIENT_MESSAGES.end()) [[unlikely]] {
+            return false;
+          }
+
+          Ack();
+          break;
+        }
+
+        case end::SERVER: {
+          // Check if the code exists
+          if (std::find(
+            SERVER_MESSAGES.begin(), SERVER_MESSAGES.end(), code
+          ) == SERVER_MESSAGES.end()) [[unlikely]] {
+            return false;
+          }
+
+          // Send the message code
+          Send(std::vector<unsigned char>(code.begin(), code.end()));
+
+          // Check if the client received the message
+          return ReadAck();
+        }
+      }
+
+      return false;
+    }
+
+
+    std::map<std::size_t, std::size_t> watched;
+    std::mutex watchedMutex;
+    std::condition_variable watchedCv;
+};
+
+
+inline auto HandleConnProxy(void *server) noexcept {
+  static_cast<Server *>(server)->HandleConnection();
 }
