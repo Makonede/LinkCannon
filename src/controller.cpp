@@ -17,13 +17,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-module;
-
-#define _GNU_SOURCE
-
 export module controller;
 
 export import botw;
+
+#define _GNU_SOURCE
 
 
 export enum class btn : unsigned int {
