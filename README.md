@@ -12,7 +12,7 @@ help with BTB setups.
 ### Prerequisites
 
 - A homebrewed Nintendo Switch running [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere)
-- [Python] 3.11+
+- [Python] 3.12+
 - A dump of `Pack/Bootup.pack`, `Pack/Bootup_USen.pack`, and `System/Resource/ResourceSizeTable.product.srsizetable`
 from Breath of the Wild 1.6.0
 
