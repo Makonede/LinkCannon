@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments', ''
+)]
 $PSNativeCommandUseErrorActionPreference = $true
 $ErrorActionPreference = 'Stop'
 
@@ -21,7 +24,9 @@ $ErrorActionPreference = 'Stop'
 $TID='01007EF00011E000'
 $RELEASE_PATH="release\atmosphere\contents\$TID"
 
-if (Test-Path build) { Remove-Item build\* -Recurse -Force }
+(Test-Path build) ? (Remove-Item build\* -Recurse -Force) : (
+  New-Item build -ItemType Directory -Force
+)
 py -3 tools\botw-link config\botw-link.toml -cvV 160
 if (Test-Path release) { Remove-Item release -Recurse -Force }
 if (Test-Path patched) { Remove-Item patched -Recurse -Force }

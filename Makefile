@@ -23,7 +23,7 @@ TARGET := LinkCannon
 BUILD_DIR := .
 ROOT_DIR := ..
 LIB_DIR := $(ROOT_DIR)/lib
-SOURCE_DIR := $(ROOT_DIR)/src/
+SOURCE_DIR := $(ROOT_DIR)/src
 CONFIG_DIR := $(ROOT_DIR)/config
 ALL_SOURCES_DIRS := $(shell find $(SOURCE_DIR) -type d)
 LIBDIRS := $(PORTLIBS) $(LIBNX)
@@ -45,7 +45,7 @@ INCLUDE := $(foreach dir,$(ALL_INCLUDE_DIRS),-I$(CURDIR)/$(dir)) $(foreach dir,$
 DEFINES := -D__SWITCH__ -DSWITCH -DNNSDK $(EXTRA_DEFINES)
 ARCH := -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
 CFLAGS := -g -Wall -ffunction-sections -O3 $(ARCH) $(DEFINES) $(INCLUDE) $(BOTW_VERSION_DEFINES)
-CXXFLAGS := $(CFLAGS) -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive -std=gnu++2b -fmodules-ts
+CXXFLAGS := $(CFLAGS) -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive -std=gnu++23
 ASFLAGS := -g $(ARCH)
 LDFLAGS := -specs=$(SWITCH_SPECS) -g $(ARCH) -Wl,-Map,$(TARGET).map -Wl,--version-script=$(LINKER_VERSION_SCRIPT) -Wl,-init=LinkCannon_init -Wl,-fini=LinkCannon_fini -Wl,--export-dynamic -nodefaultlibs
 LIBS := -lgcc -lstdc++ -u malloc

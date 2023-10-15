@@ -19,13 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-import <condition_variable>;
-import <map>;
-import <mutex>;
-import <string>;
-import <vector>;
+#include <condition_variable>
+#include <map>
+#include <mutex>
+#include <string>
+#include <vector>
 
-import <cstddef>;
+#include <cstddef>
 
 #include <nn/socket.h>
 

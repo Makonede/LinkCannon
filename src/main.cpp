@@ -19,8 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define _GNU_SOURCE
 
-import <cstdlib>;
-import <cstring>;
+#include <cstdlib>
+#include <cstring>
 
 #include <nn/os.h>
 
@@ -266,4 +266,4 @@ extern "C" constexpr auto LinkCannon_init() noexcept {
 
 
 // Finalization function
-[[maybe_unused]] extern "C" inline constexpr auto LinkCannon_fini() noexcept {}
+extern "C" constexpr auto LinkCannon_fini() noexcept {}
