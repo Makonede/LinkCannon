@@ -19,13 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define _GNU_SOURCE
 
-#include <cstdlib>
-#include <cstring>
+import <cstdlib>;
+import <cstring>;
 
 #include <nn/os.h>
 
-import controller;
-import server;
+#include <controller.hpp>
+#include <server.hpp>
 
 
 constexpr auto PORT = static_cast<unsigned short>(52617u);

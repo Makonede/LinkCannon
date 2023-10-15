@@ -1,5 +1,5 @@
 /*
-controller.cpp - C++ file for helper functions for controllers.
+controller.hpp - Header file for helper functions for controllers.
 Copyright (C) 2023  Makonede
 
 This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-export module controller;
+#pragma once
 
-#define _GNU_SOURCE
-
-export import botw;
+#include <botw.hpp>
 
 
-export enum class btn : unsigned int {
+enum class btn : unsigned int {
   A = 0x00000001,
   B = 0x00000002,
   ZL = 0x00000004,
@@ -53,7 +51,7 @@ export enum class btn : unsigned int {
 };
 
 
-export inline constexpr btn operator|(btn lhs, btn rhs) noexcept {
+inline constexpr btn operator|(btn lhs, btn rhs) noexcept {
   return static_cast<btn>(
     static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs)
   );
