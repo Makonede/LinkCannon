@@ -72,7 +72,7 @@ the given instructions.
 - Windows 7+, Linux, or macOS — `x86_64` architecture
 - devkitPro [`switch-dev`](https://switchbrew.org/wiki/Setting_up_Development_Environment)
 (devkitA64 and libnx)
-- [Python] 3.11+
+- [Python] 3.12+
 
 ### Steps
 
