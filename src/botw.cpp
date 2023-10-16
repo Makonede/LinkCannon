@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace ksys::evt {
   Metadata::~Metadata() {
-    if (mOrderParam) {
+    if (mOrderParam) [[likely]] {
       delete mOrderParam;
       mOrderParam = nullptr;
     }
