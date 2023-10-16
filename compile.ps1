@@ -21,8 +21,8 @@ $PSNativeCommandUseErrorActionPreference = $true
 $ErrorActionPreference = 'Stop'
 
 
-$TID='01007EF00011E000'
-$RELEASE_PATH="release\atmosphere\contents\$TID"
+$TID = '01007EF00011E000'
+$RELEASE_PATH = "release\atmosphere\contents\$TID"
 
 (Test-Path build) ? (Remove-Item build\* -Recurse -Force) : (
   New-Item build -ItemType Directory -Force
