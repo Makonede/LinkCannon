@@ -19,6 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define _GNU_SOURCE
 
+#include <memory>
+
 #include <cstdlib>
 #include <cstring>
 
@@ -81,7 +83,7 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
 
 // Memory watcher thread
 [[noreturn]] auto WatchThread(void *serverPtr) noexcept {
-  auto *server = static_cast<Server *>(serverPtr);
+  auto server = *static_cast<std::shared_ptr<Server> *>(serverPtr);
 
   // Watch the requested memory addresses
   while (true) [[likely]] {
@@ -132,14 +134,14 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
 // Network data thread
 constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   // Initialize the server
-  Server server;
+  auto server = std::make_shared<Server>();
 
-  while (!server.Init(PORT)) [[unlikely]] {
+  while (!server->Init(PORT)) [[unlikely]] {
     Yield();
   }
 
   // Connect to the client
-  while (!server.Connect()) [[unlikely]] {
+  while (!server->Connect()) [[unlikely]] {
     Yield();
   }
 
@@ -169,58 +171,58 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   while (true) [[likely]] {
     // Receive a message code
     std::string code;
-    server.StartMessage(Server::end::CLIENT, code);
+    server->StartMessage(Server::end::CLIENT, code);
 
     if (code == "ADDR"s) {
       // ADDR - add address to watch
-      auto address = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
-      auto size = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
+      auto address = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
+      auto size = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
 
       // Start watching the address or update its maximum size
       {
-        const std::lock_guard<std::mutex> lock(server.watchedMutex);
-        server.watched[address] = size;
+        const std::lock_guard<std::mutex> lock(server->watchedMutex);
+        server->watched[address] = size;
       }
 
       // Notify the watcher thread that data is available and acknowledge the
       // message
-      server.watchedCv.notify_one();
-      server.Ack();
+      server->watchedCv.notify_one();
+      server->Ack();
     }
     else if (code == "RADD"s) {
       // RADD - stop watching address
-      auto address = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
+      auto address = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
 
       // If the address is being watched, stop watching it
       {
-        const std::lock_guard<std::mutex> lock(server.watchedMutex);
-        auto watchedAddr = server.watched.find(address);
+        const std::lock_guard<std::mutex> lock(server->watchedMutex);
+        auto watchedAddr = server->watched.find(address);
 
-        if (watchedAddr != server.watched.end()) [[likely]] {
-          server.watched.erase(watchedAddr);
-          server.Ack();
+        if (watchedAddr != server->watched.end()) [[likely]] {
+          server->watched.erase(watchedAddr);
+          server->Ack();
         }
         else [[unlikely]] {
-          server.Nack();
+          server->Nack();
         }
       }
 
-      server.watchedCv.notify_one();
+      server->watchedCv.notify_one();
     }
     else if (code == "DATA"s) {
       // DATA - write data to address
-      auto address = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
-      auto size = *reinterpret_cast<std::size_t *>(server.Read(8uz).data());
-      server.Ack();
+      auto address = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
+      auto size = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
+      server->Ack();
 
       // Read and write the data
-      const auto *data = server.Read(size).data();
+      const auto *data = server->Read(size).data();
       std::memcpy(
         static_cast<void *>(botw::Memory + address),
         static_cast<const void *>(data), size
       );
 
-      server.Ack();
+      server->Ack();
     }
   }
 }
