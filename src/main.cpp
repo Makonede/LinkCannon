@@ -146,7 +146,7 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   }
 
   // Start the memory watcher thread
-  static nn::os::ThreadType watchThread;
+  auto watchThread = std::make_unique<nn::os::ThreadType>();
   constexpr auto STACK_SIZE = 0x80000uz;
   constexpr auto ALIGNMENT = 0x1000uz;
   auto *watchStack = aligned_alloc(ALIGNMENT, STACK_SIZE);
@@ -158,14 +158,14 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   constexpr auto PRIORITY = 16;
 
   if (nn::os::CreateThread(
-    &watchThread, WatchThread, static_cast<void *>(&server), watchStack,
+    watchThread.get(), WatchThread, static_cast<void *>(&server), watchStack,
     static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
   ).IsFailure()) [[unlikely]] {
     free(watchStack);
     return;
   }
 
-  nn::os::StartThread(&watchThread);
+  nn::os::StartThread(watchThread.release());
 
   // Start processing messages
   while (true) [[likely]] {
@@ -230,8 +230,8 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
 // Initialization function (entrypoint)
 extern "C" constexpr auto LinkCannon_init() noexcept {
-  nn::os::ThreadType eventThread;
-  nn::os::ThreadType networkThread;
+  auto eventThread = std::make_unique<nn::os::ThreadType>();
+  auto networkThread = std::make_unique<nn::os::ThreadType>();
 
   // Allocate memory for the thread stacks
   constexpr auto STACK_SIZE = 0x80000uz;
@@ -248,10 +248,10 @@ extern "C" constexpr auto LinkCannon_init() noexcept {
   constexpr auto PRIORITY = 16;
 
   if (nn::os::CreateThread(
-    &eventThread, EventThread, nullptr, eventStack,
+    eventThread.get(), EventThread, nullptr, eventStack,
     static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
   ).IsFailure() || nn::os::CreateThread(
-    &networkThread, NetworkThread, nullptr, networkStack,
+    networkThread.get(), NetworkThread, nullptr, networkStack,
     static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
   ).IsFailure()) [[unlikely]] {
     // Free the thread stacks if it fails
@@ -262,8 +262,8 @@ extern "C" constexpr auto LinkCannon_init() noexcept {
   }
 
   // Start the threads
-  nn::os::StartThread(&eventThread);
-  nn::os::StartThread(&networkThread);
+  nn::os::StartThread(eventThread.release());
+  nn::os::StartThread(networkThread.release());
 }
 
 

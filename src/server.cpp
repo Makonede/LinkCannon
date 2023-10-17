@@ -327,7 +327,7 @@ auto Server::Connect() noexcept -> bool {
     return true;
   }
 
-  static nn::os::ThreadType serverThread;
+  auto serverThread = std::make_unique<nn::os::ThreadType>();
 
   // Allocate memory for the server thread stack
   constexpr auto STACK_SIZE = 0x80000uz;
@@ -342,7 +342,7 @@ auto Server::Connect() noexcept -> bool {
   constexpr auto PRIORITY = 16;
 
   if (nn::os::CreateThread(
-    &serverThread, HandleConnProxy, static_cast<void *>(this), stack,
+    serverThread.get(), HandleConnProxy, static_cast<void *>(this), stack,
     static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
   ).IsFailure()) [[unlikely]] {
     // Free the thread stack if it fails
@@ -351,7 +351,7 @@ auto Server::Connect() noexcept -> bool {
   }
 
   // Start the thread
-  nn::os::StartThread(&serverThread);
+  nn::os::StartThread(serverThread.release());
 
   // Wait for a connection
   do [[unlikely]] {
