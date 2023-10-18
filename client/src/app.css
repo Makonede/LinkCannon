@@ -1,0 +1,32 @@
+@charset "utf-8";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+  font-family: 'Cascadia Code PL';
+  src: url('/font/CascadiaCodePL.woff2');
+}
+
+@font-face {
+  font-family: 'Cascadia Code PL';
+  src: url('/font/CascadiaCodePLItalic.woff2');
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Cascadia Mono PL';
+  src: url('/font/CascadiaMonoPL.woff2');
+}
+
+@font-face {
+  font-family: 'Cascadia Mono PL';
+  src: url('/font/CascadiaMonoPLItalic.woff2');
+  font-style: italic;
+}
+
+textarea::-webkit-resizer {
+  display: none;
+}

@@ -1,0 +1,50 @@
+{
+  "name": "link-cannon",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "FORCE_COLOR=1 vite dev",
+    "build": "FORCE_COLOR=1 vite build",
+    "preview": "FORCE_COLOR=1 vite preview",
+    "check": "FORCE_COLOR=1 svelte-kit sync && FORCE_COLOR=1 svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "FORCE_COLOR=1 svelte-kit sync && FORCE_COLOR=1 svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "FORCE_COLOR=1 prettier --plugin-search-dir . --check . && FORCE_COLOR=1 eslint .",
+    "format": "FORCE_COLOR=1 prettier --plugin-search-dir . --write ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^2.0.0",
+    "@sveltejs/adapter-static": "^2.0.3",
+    "@sveltejs/kit": "^1.20.4",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.6",
+    "@tailwindcss/typography": "^0.5.10",
+    "@tauri-apps/cli": "^1.5.4",
+    "@types/eslint": "^8.44.2",
+    "@types/eslint-config-prettier": "^6.11.0",
+    "@types/node": "^20.6.3",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "autoprefixer": "^10.4.16",
+    "esbuild": "^0.19.5",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-svelte": "^2.30.0",
+    "postcss": "^8.4.30",
+    "prettier": "^2.8.0",
+    "prettier-plugin-svelte": "^2.10.1",
+    "svelte": "^4.0.5",
+    "svelte-check": "^3.4.3",
+    "tailwindcss": "^3.3.3",
+    "tslib": "^2.4.1",
+    "turbo": "latest",
+    "typescript": "^5.0.0",
+    "vite": "^4.4.2"
+  },
+  "type": "module",
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.1",
+    "@types/lodash-es": "^4.17.9",
+    "futil": "^1.76.0",
+    "lodash-es": "^4.17.21"
+  }
+}
