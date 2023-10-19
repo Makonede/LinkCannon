@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define _GNU_SOURCE
 
 #include <algorithm>
+#include <utility>
 
 #include <cstdlib>
 
@@ -152,7 +153,10 @@ auto Server::StartMessage(
 
       // Check if the client received the message
       return ReadAck();
+      break;
     }
+
+    default: std::unreachable();
   }
 
   return false;
@@ -315,7 +319,10 @@ auto Server::HandleConnection() noexcept -> void {
 
         // Notify Server::Send to return
         outPacketCv.notify_all();
+        break;
       }
+
+      default: std::unreachable();
     }
   }
 }
