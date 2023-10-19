@@ -110,19 +110,19 @@ class Server {
     int serverSocket = -1;
     int clientSocket = -1;
     bool connected = false;
-    int messageId = 0;
+    unsigned int messageId = 0;
 
-    std::map<int, sig> signals;
+    std::map<unsigned int, sig> signals;
     std::mutex signalMutex;
     std::condition_variable signalCv;
 
-    std::map<int, std::vector<unsigned char>> inPackets;
+    std::map<unsigned int, std::vector<unsigned char>> inPackets;
     std::mutex inPacketMutex;
     std::condition_variable inPacketCv;
-    std::map<int, std::vector<unsigned char>> outPackets;
+    std::map<unsigned int, std::vector<unsigned char>> outPackets;
     std::mutex outPacketMutex;
     std::condition_variable outPacketCv;
-    std::map<int, std::size_t> lengths;
+    std::map<unsigned int, std::size_t> lengths;
     std::mutex lengthMutex;
 
   public:
