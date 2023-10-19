@@ -141,7 +141,7 @@ class Server {
       return Read(3uz) == ACK;
     }
 
-    auto StartMessage(end endpoint, std::string &code) noexcept -> bool;
+    auto StartMessage(const end endpoint, std::string &code) noexcept -> bool;
 
     std::map<std::size_t, std::size_t> watched;
     std::mutex watchedMutex;
