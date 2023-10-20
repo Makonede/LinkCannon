@@ -42,7 +42,7 @@ DFILES := $(OFILES:.o=.d)
 APP_JSON := $(CONFIG_DIR)/app.json
 LD := $(CXX)
 INCLUDE := $(foreach dir,$(ALL_INCLUDE_DIRS),-I$(CURDIR)/$(dir)) $(foreach dir,$(LIBDIRS),-I$(dir)/include)
-DEFINES := -D__SWITCH__ -DSWITCH -DNNSDK $(EXTRA_DEFINES)
+DEFINES := -D__SWITCH__ -DSWITCH -DNNSDK -D_GNU_SOURCE -D_GLIBCXX_HAVE_ALIGNED_ALLOC $(EXTRA_DEFINES)
 ARCH := -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
 CFLAGS := -g -Wall -ffunction-sections -O3 $(ARCH) $(DEFINES) $(INCLUDE) $(BOTW_VERSION_DEFINES)
 CXXFLAGS := $(CFLAGS) -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive -std=gnu++23

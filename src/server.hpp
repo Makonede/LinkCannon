@@ -91,18 +91,9 @@ class Server {
       clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
     }
 
-    const std::vector<unsigned char> HANDSHAKE{
-      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
-      static_cast<unsigned char>('\0')
-    };
-    const std::vector<unsigned char> ACK{
-      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
-      static_cast<unsigned char>('\1')
-    };
-    const std::vector<unsigned char> NACK{
-      static_cast<unsigned char>('L'), static_cast<unsigned char>('C'),
-      static_cast<unsigned char>('\2')
-    };
+    const std::vector<unsigned char> HANDSHAKE{'L', 'C', '\0'};
+    const std::vector<unsigned char> ACK{'L', 'C', '\1'};
+    const std::vector<unsigned char> NACK{'L', 'C', '\2'};
 
     const std::vector<std::string> CLIENT_MESSAGES{"ADDR"s, "RADD"s, "DATA"s};
     const std::vector<std::string> SERVER_MESSAGES{"DATA"s};

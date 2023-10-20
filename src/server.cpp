@@ -17,8 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#define _GNU_SOURCE
-
 #include <algorithm>
 #include <utility>
 
@@ -44,7 +42,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
   // Allocate memory for the socket pool
   constexpr auto POOL_SIZE = 0x100000uz;
   constexpr auto ALIGNMENT = 0x1000uz;
-  auto *pool = aligned_alloc(ALIGNMENT, POOL_SIZE);
+  auto *pool = std::aligned_alloc(ALIGNMENT, POOL_SIZE);
 
   if (pool == nullptr) [[unlikely]] {
     return false;
@@ -59,7 +57,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
     CONCURRENCY_LIMIT
   ).IsFailure()) [[unlikely]] {
     // Free the pool if it fails
-    free(pool);
+    std::free(pool);
     return false;
   }
 
@@ -334,31 +332,10 @@ auto Server::Connect() noexcept -> bool {
     return true;
   }
 
-  auto serverThread = std::make_unique<nn::os::ThreadType>();
-
-  // Allocate memory for the server thread stack
-  constexpr auto STACK_SIZE = 0x80000uz;
-  constexpr auto ALIGNMENT = 0x1000uz;
-  auto *stack = aligned_alloc(ALIGNMENT, STACK_SIZE);
-
-  if (stack == nullptr) [[unlikely]] {
+  // Start the server thread
+  if (!StartThread(HandleConnProxy, this)) [[unlikely]] {
     return false;
   }
-
-  // Attempt to create the server thread
-  constexpr auto PRIORITY = 16;
-
-  if (nn::os::CreateThread(
-    serverThread.get(), HandleConnProxy, static_cast<void *>(this), stack,
-    static_cast<unsigned long long>(STACK_SIZE), PRIORITY, 0
-  ).IsFailure()) [[unlikely]] {
-    // Free the thread stack if it fails
-    free(stack);
-    return false;
-  }
-
-  // Start the thread
-  nn::os::StartThread(serverThread.release());
 
   // Wait for a connection
   do [[unlikely]] {
