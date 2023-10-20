@@ -215,9 +215,7 @@ extern "C" constexpr auto LinkCannon_init() noexcept {
   const std::vector<ThreadFunc> THREADS{EventThread, NetworkThread};
 
   for (const auto &thread : THREADS) [[likely]] {
-    if (!StartThread(thread)) [[unlikely]] {
-      return;
-    }
+    StartThread(thread);
   }
 }
 
