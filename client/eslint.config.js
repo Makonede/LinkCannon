@@ -28,7 +28,6 @@ import svelte from 'eslint-plugin-svelte'
 import svelteParser from 'svelte-eslint-parser'
 
 import prettier from 'eslint-config-prettier'
-import prettierSvelte from 'prettier-plugin-svelte'
 
 
 export default [
@@ -50,7 +49,6 @@ export default [
       }
     },
     plugins: {
-      prettierSvelte: prettierSvelte,
       typescript: typescript,
       svelte: svelte
     }
