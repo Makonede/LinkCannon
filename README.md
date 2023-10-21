@@ -106,7 +106,7 @@ dump of `ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
 
 ## Credits
 
-- [iTNTPiston](https://github.com/iTNTPiston) for his [save state mod](https://github.com/iTNTPiston/botw-save-state)
+- [Pistonight](https://github.com/Pistonight) for his [save state mod](https://github.com/Pistonight/botw-save-state)
 which I used as a scaffold and for helping debug and find mistakes.
 - [Shadów](https://github.com/shadowninja108) for helping with decompilation, for
 his [exlaunch](https://github.com/shadowninja108/exlaunch) framework, for helping
