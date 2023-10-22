@@ -23,5 +23,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 fn main() {
   tauri::Builder::default()
     .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .expect("Error while running Tauri application");
 }
