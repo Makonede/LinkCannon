@@ -131,11 +131,12 @@ auto Server::StartMessage(
       if (std::find(
         CLIENT_MESSAGES.begin(), CLIENT_MESSAGES.end(), code
       ) == CLIENT_MESSAGES.end()) [[unlikely]] {
+        Nack();
         return false;
       }
 
       Ack();
-      break;
+      return true;
     }
 
     case end::SERVER: {
@@ -151,13 +152,10 @@ auto Server::StartMessage(
 
       // Check if the client received the message
       return ReadAck();
-      break;
     }
-
-    default: std::unreachable();
   }
 
-  return false;
+  std::unreachable();
 }
 
 

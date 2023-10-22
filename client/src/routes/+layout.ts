@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+
 
 export const prerender = true
 export const ssr = false

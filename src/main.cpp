@@ -152,7 +152,9 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
   while (true) [[likely]] {
     // Receive a message code
     std::string code;
-    server->StartMessage(Server::end::CLIENT, code);
+    if (!server->StartMessage(Server::end::CLIENT, code)) [[unlikely]] {
+      continue;
+    }
 
     if (code == "ADDR"s) {
       // ADDR - add address to watch

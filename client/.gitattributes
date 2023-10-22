@@ -1,1 +1,2 @@
 .prettierrc linguist-language=JSON
+*.lockb binary diff=lockb

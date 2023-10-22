@@ -79,18 +79,6 @@ class Server {
       ) > 0 && socketFd.revents & READY));
     }
 
-    inline auto Reconnect() noexcept {
-      // Close and reset the socket
-      nn::socket::Close(clientSocket);
-      clientSocket = -1;
-
-      // Wait for a new connection
-      Poll(end::SERVER);
-
-      // A connection has been made; accept it
-      clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
-    }
-
     const std::vector<unsigned char> HANDSHAKE{'L', 'C', '\0'};
     const std::vector<unsigned char> ACK{'L', 'C', '\1'};
     const std::vector<unsigned char> NACK{'L', 'C', '\2'};
@@ -137,6 +125,22 @@ class Server {
     std::map<std::size_t, std::size_t> watched;
     std::mutex watchedMutex;
     std::condition_variable watchedCv;
+
+  private:
+    inline auto Reconnect() noexcept {
+      // Nack the last message
+      Nack();
+
+      // Close and reset the socket
+      nn::socket::Close(clientSocket);
+      clientSocket = -1;
+
+      // Wait for a new connection
+      Poll(end::SERVER);
+
+      // A connection has been made; accept it
+      clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
+    }
 };
 
 
