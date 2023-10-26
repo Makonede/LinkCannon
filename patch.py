@@ -18,10 +18,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from vidua import bps
-
 from pathlib import Path
 from shutil import copytree
+
+from vidua import bps
 
 
 def list_files(path: Path) -> list[Path]:
