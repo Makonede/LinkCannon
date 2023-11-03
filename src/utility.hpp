@@ -29,7 +29,7 @@ typedef void (*ThreadFunc)(void *);
 
 
 // Create a thread
-template <class T = void>
+template <typename T = void>
 inline constexpr auto StartThread(ThreadFunc func, T *arg = nullptr) {
   auto thread = std::make_unique<nn::os::ThreadType>();
   constexpr auto STACK_SIZE = 0x80000uz;
