@@ -16,12 +16,54 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![feature(mutex_unlock)]
 
+use std::io;
+use std::io::{Read, Write};
+
+use std::net::TcpStream;
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+
+#[tauri::command]
+fn connect(address: String, port: u16) -> Result<(), String> {
+  let stringify = |e: io::Error| e.to_string();
+
+  let stream = TcpStream::connect((&address, port)).map_err(stringify)?;
+  let stream = Arc::new(Mutex::new(stream));
+  let mut buf = [0u8; 3];
+
+  // Send the handshake
+  let mut client = stream.lock().unwrap();
+  client.write(&[0x4cu8, 0x43u8, 0x00u8]).map_err(stringify)?;
+  client.read_exact(&mut buf).map_err(stringify)?;
+  Mutex::unlock(client);
+
+  if buf != [0x4cu8, 0x43u8, 0x01u8] {
+    return Err("Handshake failed".to_owned());
+  }
+
+  let stream2 = stream.clone();
+  let messages = thread::spawn(move || {
+    // TODO
+  });
+
+  let stream = stream2;
+  let watch = thread::spawn(move || {
+    // TODO
+  });
+
+  messages.join().unwrap();
+  watch.join().unwrap();
+
+  Ok(())
+}
 
 fn main() {
   tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![connect])
     .run(tauri::generate_context!())
     .expect("Error while running Tauri application");
 }

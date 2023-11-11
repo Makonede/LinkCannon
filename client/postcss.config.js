@@ -1,3 +1,5 @@
+// @ts-check
+
 /*
 postcss.config.js - PostCSS configuration file.
 Copyright (C) 2023  Makonede

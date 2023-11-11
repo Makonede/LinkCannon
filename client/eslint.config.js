@@ -1,3 +1,5 @@
+// @ts-check
+
 /*
 eslint.config.js - ESLint configuration file.
 Copyright (C) 2023  Makonede

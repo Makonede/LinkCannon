@@ -1,3 +1,5 @@
+// @ts-check
+
 /*
 svelte.config.js - Svelte configuration file.
 Copyright (C) 2023  Makonede
