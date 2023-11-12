@@ -31,7 +31,7 @@ use std::thread;
 fn connect(address: String, port: u16) -> Result<(), String> {
   let stringify = |e: io::Error| e.to_string();
 
-  let stream = TcpStream::connect((&address, port)).map_err(stringify)?;
+  let stream = TcpStream::connect((address.as_str(), port)).map_err(stringify)?;
   let stream = Arc::new(Mutex::new(stream));
   let mut buf = [0u8; 3];
 

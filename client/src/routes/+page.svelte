@@ -16,7 +16,7 @@
   bind:value={port}>
 
 <button on:click={async () => {
-  err = ''
+  err = 'Connecting...'
   color = 'slate'
 
   try {
