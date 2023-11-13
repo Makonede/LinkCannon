@@ -2,8 +2,8 @@
   import { invoke } from '@tauri-apps/api/tauri'
 
   const PORT = 52617
-  let address = ''
-  let port = ''
+  let address: string
+  let port: string
   let err = ''
   let color = 'slate'
 </script>
