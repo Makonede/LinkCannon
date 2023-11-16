@@ -25,7 +25,7 @@ $TID = '01007EF00011E000'
 $RELEASE_PATH = "release\atmosphere\contents\$TID"
 
 (Test-Path build) ? (Remove-Item build\* -Recurse -Force) : (
-  New-Item build -ItemType Directory -Force
+    New-Item build -ItemType Directory -Force
 )
 py -3 tools\botw-link config\botw-link.toml -cvV 160
 if (Test-Path release) { Remove-Item release -Recurse -Force }
