@@ -12,7 +12,7 @@
 <input type='text' name='address' required maxlength=39 bind:value={address}>
 <label for='port'>Port</label>
 <input type='text' inputmode='numeric' name='port' maxlength=5
-  pattern='[^\D0]\d{'{'}0,4{'}'}' placeholder={PORT.toString()}
+  pattern='[^\D0]\d{'{'}0,4{'}'}' placeholder={`${PORT}`}
   bind:value={port}>
 
 <button on:click={async () => {
