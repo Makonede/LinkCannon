@@ -37,12 +37,12 @@ Copy-Item romfs $RELEASE_PATH -Recurse -Force
 py -3 patch.py
 Copy-Item patched\* $RELEASE_PATH\romfs -Recurse -Force
 
-Write-Host @"
+Write-Host @'
 
 Build complete. To install, copy the contents of the release folder onto the
 root of your microSD card.
 
 Press any key to continue...
-"@
+'@
 
 [void][System.Console]::ReadKey($true)
