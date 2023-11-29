@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 .extern __nx_module_runtime
 
 __module_start:
-    .word 0x00000000
+    .word 0
     .word __nx_mod0 - __module_start
 
     .align 4
