@@ -145,6 +145,11 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
   // Start the memory watcher thread
   if (!StartThread(WatchThread, &server)) [[unlikely]] {
+    uintptr_t stack;
+    [[maybe_unused]] std::size_t unused;
+    nn::os::GetCurrentStackInfo(&stack, &unused);
+    std::free(reinterpret_cast<void *>(stack));
+
     return;
   }
 
@@ -214,9 +219,7 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 // Initialization function (entrypoint)
 extern "C" constexpr auto LinkCannon_init() noexcept {
   // Start all threads
-  const std::vector<ThreadFunc> THREADS{EventThread, NetworkThread};
-
-  for (const auto &thread : THREADS) [[likely]] {
+  for (const auto &thread : {EventThread, NetworkThread}) [[likely]] {
     StartThread(thread);
   }
 }
