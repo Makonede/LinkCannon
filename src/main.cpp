@@ -145,11 +145,6 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
   // Start the memory watcher thread
   if (!StartThread(WatchThread, &server)) [[unlikely]] {
-    uintptr_t stack;
-    [[maybe_unused]] std::size_t unused;
-    nn::os::GetCurrentStackInfo(&stack, &unused);
-    std::free(reinterpret_cast<void *>(stack));
-
     return;
   }
 
