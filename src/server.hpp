@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <map>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <cstddef>
@@ -66,7 +67,10 @@ class Server {
 
         case end::SERVER: {
           sock = serverSocket;
+          break;
         }
+
+        default: std::unreachable();
       }
 
       constexpr auto READY = static_cast<short>(POLLIN);
