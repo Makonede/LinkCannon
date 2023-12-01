@@ -69,7 +69,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 
   if (!nn::nifm::IsNetworkAvailable()) [[unlikely]] {
     nn::socket::Finalize();
-    free(pool);
+    std::free(pool);
 
     return false;
   }
@@ -79,7 +79,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
 
   if (serverSocket < 0) [[unlikely]] {
     nn::socket::Finalize();
-    free(pool);
+    std::free(pool);
 
     return false;
   }
@@ -98,7 +98,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
     nn::socket::Close(serverSocket);
     serverSocket = -1;
     nn::socket::Finalize();
-    free(pool);
+    std::free(pool);
 
     return false;
   }
@@ -108,7 +108,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
     nn::socket::Close(serverSocket);
     serverSocket = -1;
     nn::socket::Finalize();
-    free(pool);
+    std::free(pool);
 
     return false;
   }
