@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <map>
 #include <mutex>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -93,6 +94,7 @@ class Server {
     int serverSocket = -1;
     int clientSocket = -1;
     bool connected = false;
+    unsigned int packetId = 0;
     unsigned int messageId = 0;
 
     std::map<unsigned int, sig> signals;
@@ -114,14 +116,37 @@ class Server {
     auto Read(const std::size_t length) noexcept -> std::vector<unsigned char>;
     auto Send(const std::vector<unsigned char> data) noexcept -> void;
 
-    inline auto Ack() noexcept -> void {
+    template <typename T>
+    inline auto Read([[maybe_unused]] const std::size_t length = 0uz) noexcept {
+      if constexpr (std::is_same_v<T, std::string>) {
+        const auto data = Read(length);
+        return std::string(data.begin(), data.end());
+      }
+      else if (std::is_integral_v<T>) {
+        const auto data = Read(sizeof(T));
+        return *reinterpret_cast<T *>(data.data());
+      }
+
+      std::unreachable();
+    }
+
+    template <typename T>
+    inline auto Send(const T data) noexcept {
+      const auto *dataPtr = reinterpret_cast<const unsigned char *>(&data);
+      Send(std::vector(dataPtr, dataPtr + sizeof(T)));
+    }
+
+    inline auto SendId() noexcept {
+      Send(++messageId);
+    }
+    inline auto Ack() noexcept {
       Send(ACK);
     }
-    inline auto Nack() noexcept -> void {
+    inline auto Nack() noexcept {
       Send(NACK);
     }
-    inline auto ReadAck() noexcept -> bool {
-      return Read(3uz) == ACK;
+    inline const auto ReadAck() noexcept {
+      return Read(ACK.size()) == ACK;
     }
 
     auto StartMessage(const end endpoint, std::string &code) noexcept -> bool;
