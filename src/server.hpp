@@ -141,6 +141,11 @@ class Server {
       }
     }
 
+    template <typename T>
+    inline auto Send(const T *data, const std::size_t size) noexcept {
+      Send(std::vector(data, data + size));
+    }
+
     inline auto SendId() noexcept {
       Send(++messageId);
     }
