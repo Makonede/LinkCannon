@@ -132,8 +132,13 @@ class Server {
 
     template <typename T>
     inline auto Send(const T data) noexcept {
-      const auto *dataPtr = reinterpret_cast<const unsigned char *>(&data);
-      Send(std::vector(dataPtr, dataPtr + sizeof(T)));
+      if constexpr (std::is_same_v<T, std::string>) {
+        Send(std::vector<unsigned char>(data.begin(), data.end()));
+      }
+      else {
+        const auto *dataPtr = reinterpret_cast<const unsigned char *>(&data);
+        Send(std::vector(dataPtr, dataPtr + sizeof(T)));
+      }
     }
 
     inline auto SendId() noexcept {
