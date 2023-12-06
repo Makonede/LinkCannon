@@ -158,8 +158,8 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
     if (code == "ADDR"s) {
       // ADDR - add address to watch
-      auto address = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
-      auto size = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
+      auto address = server->Read<std::size_t>();
+      auto size = server->Read<std::size_t>();
 
       // Start watching the address or update its maximum size
       {
@@ -174,7 +174,7 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
     }
     else if (code == "RADD"s) {
       // RADD - stop watching address
-      auto address = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
+      auto address = server->Read<std::size_t>();
 
       // If the address is being watched, stop watching it
       {
@@ -194,8 +194,8 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
     }
     else if (code == "DATA"s) {
       // DATA - write data to address
-      auto address = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
-      auto size = *reinterpret_cast<std::size_t *>(server->Read(8uz).data());
+      auto address = server->Read<std::size_t>();
+      auto size = server->Read<std::size_t>();
       server->Ack();
 
       // Read and write the data
