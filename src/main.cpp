@@ -92,34 +92,25 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
     });
 
     // Read from each memory address
-    auto watched = std::map(server->watched);
+    const auto watched = std::map(server->watched);
     lock.unlock();
 
     for (const auto &[address, size] : watched) [[likely]] {
-      auto code = "DATA"s;
+      const auto code = "DATA"s;
 
       if (!server->StartMessage(Server::end::SERVER, code)) [[unlikely]] {
         break;
       }
 
-      // Send the address and size
-      server->Send(std::vector(
-        reinterpret_cast<const unsigned char *>(&address),
-        reinterpret_cast<const unsigned char *>(&address) + 8uz
-      ));
-      server->Send(std::vector(
-        reinterpret_cast<const unsigned char *>(&size),
-        reinterpret_cast<const unsigned char *>(&size) + 8uz
-      ));
+      server->Send(address);
+      server->Send(size);
 
       if (!server->ReadAck()) [[unlikely]] {
         break;
       }
 
       // Send the data
-      server->Send(std::vector(
-        botw::Memory + address, botw::Memory + address + size
-      ));
+      server->Send(botw::Memory + address, size);
 
       if (!server->ReadAck()) [[unlikely]] {
         break;
