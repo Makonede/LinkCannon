@@ -123,8 +123,7 @@ auto Server::StartMessage(
   switch (endpoint) {
     case end::CLIENT: {
       // Read the message code
-      auto codeVec = Read(4uz);
-      code = std::string(codeVec.begin(), codeVec.end());
+      code = Read<std::string>(4uz);
 
       // Check if the code exists
       if (std::find(
@@ -243,14 +242,14 @@ auto Server::HandleConnection() noexcept -> void {
     // Execute next signal
     auto signalIt = signals.begin();
     auto signal = signalIt->second;
-    auto currentMessageId = signalIt->first;
+    auto currentPacketId = signalIt->first;
     signals.erase(signalIt);
     lock.unlock();
 
     switch (signal) {
       case sig::READ: {
         // Receive data
-        auto lengthIt = lengths.find(currentMessageId);
+        auto lengthIt = lengths.find(currentPacketId);
         auto length = lengthIt->second;
         std::vector<unsigned char> data(length);
 
@@ -275,7 +274,7 @@ auto Server::HandleConnection() noexcept -> void {
         // Add packet to queue
         {
           const std::lock_guard<std::mutex> lock(inPacketMutex);
-          inPackets[currentMessageId] = data;
+          inPackets[currentPacketId] = data;
         }
 
         // Notify Server::Read to return
@@ -285,7 +284,7 @@ auto Server::HandleConnection() noexcept -> void {
 
       case sig::SEND: {
         // Send data
-        auto dataIt = outPackets.find(currentMessageId);
+        auto dataIt = outPackets.find(currentPacketId);
         auto data = dataIt->second;
 
         auto result = nn::socket::Send(
@@ -347,30 +346,30 @@ auto Server::Connect() noexcept -> bool {
 auto Server::Read(
   const std::size_t length
 ) noexcept -> std::vector<unsigned char> {
-  auto currentMessageId = ++messageId;
+  auto currentPacketId = ++packetId;
 
   // Set the length
   {
     const std::lock_guard<std::mutex> lock(lengthMutex);
-    lengths[currentMessageId] = length;
+    lengths[currentPacketId] = length;
   }
 
   // Broadcast the signal
   {
     const std::lock_guard<std::mutex> lock(signalMutex);
-    signals[currentMessageId] = sig::READ;
+    signals[currentPacketId] = sig::READ;
   }
 
   signalCv.notify_one();
 
   // Wait for a response
   std::unique_lock<std::mutex> lock(inPacketMutex);
-  inPacketCv.wait(lock, [this, currentMessageId] {
-    return inPackets.contains(currentMessageId);
+  inPacketCv.wait(lock, [this, currentPacketId] {
+    return inPackets.contains(currentPacketId);
   });
 
   // Return the response
-  auto packetIt = inPackets.find(currentMessageId);
+  auto packetIt = inPackets.find(currentPacketId);
   auto packet = packetIt->second;
   inPackets.erase(packetIt);
   lock.unlock();
@@ -381,26 +380,26 @@ auto Server::Read(
 
 // Send data to the client
 auto Server::Send(const std::vector<unsigned char> data) noexcept -> void {
-  auto currentMessageId = ++messageId;
+  auto currentPacketId = ++packetId;
 
   // Set the data
   {
     const std::lock_guard<std::mutex> lock(outPacketMutex);
-    outPackets[currentMessageId] = data;
+    outPackets[currentPacketId] = data;
   }
 
   // Broadcast the signal
   {
     const std::lock_guard<std::mutex> lock(signalMutex);
-    signals[currentMessageId] = sig::SEND;
+    signals[currentPacketId] = sig::SEND;
   }
 
   signalCv.notify_one();
 
   // Wait for the packet to be sent
   std::unique_lock<std::mutex> lock(outPacketMutex);
-  outPacketCv.wait(lock, [this, currentMessageId] {
-    return !outPackets.contains(currentMessageId);
+  outPacketCv.wait(lock, [this, currentPacketId] {
+    return !outPackets.contains(currentPacketId);
   });
 
   lock.unlock();
