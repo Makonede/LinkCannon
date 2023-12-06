@@ -146,7 +146,7 @@ auto Server::StartMessage(
       }
 
       // Send the message code
-      Send(std::vector<unsigned char>(code.begin(), code.end()));
+      Send(code);
 
       // Check if the client received the message
       return ReadAck();
