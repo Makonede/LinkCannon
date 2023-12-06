@@ -166,7 +166,7 @@ auto Server::HandleConnection() noexcept -> void {
   clientSocket = nn::socket::Accept(serverSocket, nullptr, nullptr);
 
   // Set the client socket as non-blocking
-  auto flags = nn::socket::Fcntl(clientSocket, F_GETFL);
+  const auto flags = nn::socket::Fcntl(clientSocket, F_GETFL);
   if (flags < 0) [[unlikely]] {
     return;
   }
@@ -240,17 +240,17 @@ auto Server::HandleConnection() noexcept -> void {
     });
 
     // Execute next signal
-    auto signalIt = signals.begin();
-    auto signal = signalIt->second;
-    auto currentPacketId = signalIt->first;
+    const auto signalIt = signals.begin();
+    const auto signal = signalIt->second;
+    const auto currentPacketId = signalIt->first;
     signals.erase(signalIt);
     lock.unlock();
 
     switch (signal) {
       case sig::READ: {
         // Receive data
-        auto lengthIt = lengths.find(currentPacketId);
-        auto length = lengthIt->second;
+        const auto lengthIt = lengths.find(currentPacketId);
+        const auto length = lengthIt->second;
         std::vector<unsigned char> data(length);
 
         Poll(end::CLIENT);
@@ -284,8 +284,8 @@ auto Server::HandleConnection() noexcept -> void {
 
       case sig::SEND: {
         // Send data
-        auto dataIt = outPackets.find(currentPacketId);
-        auto data = dataIt->second;
+        const auto dataIt = outPackets.find(currentPacketId);
+        const auto data = dataIt->second;
 
         auto result = nn::socket::Send(
           clientSocket, static_cast<const void *>(data.data()),
@@ -346,7 +346,7 @@ auto Server::Connect() noexcept -> bool {
 auto Server::Read(
   const std::size_t length
 ) noexcept -> std::vector<unsigned char> {
-  auto currentPacketId = ++packetId;
+  const auto currentPacketId = ++packetId;
 
   // Set the length
   {
@@ -369,8 +369,8 @@ auto Server::Read(
   });
 
   // Return the response
-  auto packetIt = inPackets.find(currentPacketId);
-  auto packet = packetIt->second;
+  const auto packetIt = inPackets.find(currentPacketId);
+  const auto packet = packetIt->second;
   inPackets.erase(packetIt);
   lock.unlock();
 
@@ -380,7 +380,7 @@ auto Server::Read(
 
 // Send data to the client
 auto Server::Send(const std::vector<unsigned char> data) noexcept -> void {
-  auto currentPacketId = ++packetId;
+  const auto currentPacketId = ++packetId;
 
   // Set the data
   {
