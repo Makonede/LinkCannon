@@ -95,7 +95,6 @@ class Server {
     int clientSocket = -1;
     bool connected = false;
     unsigned int packetId = 0;
-    unsigned int messageId = 0;
 
     std::map<unsigned int, sig> signals;
     std::mutex signalMutex;
@@ -145,13 +144,6 @@ class Server {
       const unsigned char *data, const std::size_t size
     ) noexcept {
       Send(std::vector(data, data + size));
-    }
-
-    inline const auto NewId() noexcept {
-      return ++messageId;
-    }
-    inline const auto GetId() noexcept {
-      return messageId;
     }
 
     inline auto Ack() noexcept {
