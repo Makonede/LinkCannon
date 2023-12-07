@@ -146,7 +146,7 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
     }
 
     // Lock the watcher thread
-    std::unique_lock<std::mutex> lock(server->watchedMutex);
+    const std::lock_guard<std::mutex> lock(server->watchedMutex);
 
     if (code == "ADDR"s) {
       // ADDR - add address to watch
@@ -199,8 +199,6 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
       server->Ack();
     }
-
-    lock.unlock();
   }
 }
 
