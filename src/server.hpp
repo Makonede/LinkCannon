@@ -147,9 +147,13 @@ class Server {
       Send(std::vector(data, data + size));
     }
 
-    inline auto SendId() noexcept {
-      Send(++messageId);
+    inline auto NewId() noexcept {
+      return ++messageId;
     }
+    inline const auto GetId() noexcept {
+      return messageId;
+    }
+
     inline auto Ack() noexcept {
       Send(ACK);
     }
