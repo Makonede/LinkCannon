@@ -96,9 +96,7 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
     lock.unlock();
 
     for (const auto &[address, size] : watched) [[likely]] {
-      const auto code = "DATA"s;
-
-      if (!server->StartMessage(Server::end::SERVER, code)) [[unlikely]] {
+      if (!server->StartMessage(Server::end::SERVER, "DATA"s)) [[unlikely]] {
         break;
       }
 
@@ -146,6 +144,9 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
     if (!server->StartMessage(Server::end::CLIENT, code)) [[unlikely]] {
       continue;
     }
+
+    // Lock the watcher thread
+    std::unique_lock<std::mutex> lock(server->watchedMutex);
 
     if (code == "ADDR"s) {
       // ADDR - add address to watch
@@ -198,6 +199,8 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 
       server->Ack();
     }
+
+    lock.unlock();
   }
 }
 
