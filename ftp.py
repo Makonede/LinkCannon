@@ -70,7 +70,7 @@ def main() -> None:
         ftp.cwd(f'{LAYEREDFS}')
 
         # Check for Breath of the Wild LayeredFS
-        if any(d[0] == TITLE_ID for d in ftp.mlsd('.')):
+        if any(d[0] == TITLE_ID for d in ftp.mlsd()):
             # Check for files in Breath of the Wild LayeredFS
             if any(d[0] not in '..' for d in ftp.mlsd(TITLE_ID)):
                 overwrite = input('Mods are installed, overwrite? (y/n) ')
