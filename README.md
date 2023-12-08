@@ -25,8 +25,11 @@ in the folder that you extracted the `.zip` (or `.tar.xz`) to — the folder als
 containing `patch.py`, `patches`, and `content`. Place your dump of
 `ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
 - Run `patch.py`.
-- Extract the resulting `patched.zip` (or `patched.tar.xz`) file to the root of your
-microSD card.
+- If you have an FTP server such as [`sys-ftpd`](https://github.com/cathery/sys-ftpd)
+on your Switch, fill in the fields in `ftp.toml` and run `ftp.py` to install directly
+to your Switch.
+- If you don't, extract the resulting `patched.zip` (or `patched.tar.xz`) file to
+the root of your microSD card.
 
 > **Note**
 > If you are asked to overwrite existing files, click `Yes`.
@@ -103,6 +106,14 @@ dump of `ResourceSizeTable.product.srsizetable` in `dump/System/Resource`.
    ```
 
    To build on Windows, double-click `compile.bat`.
+
+### FTP installation
+
+Link Cannon can be installed over FTP to your Switch.
+
+1. Copy the configuration template from `config_templates/ftp.toml` to `config/`.
+2. Fill in the fields (username and password are optional).
+3. Run `ftp.py`.
 
 ## Credits
 
