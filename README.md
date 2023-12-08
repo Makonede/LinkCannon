@@ -118,7 +118,8 @@ Link Cannon can be installed over FTP to your Switch.
 ## Credits
 
 - [Pistonight](https://github.com/Pistonight) for his [save state mod](https://github.com/Pistonight/botw-save-state)
-which I used as a scaffold and for helping debug and find mistakes.
+which I used as a scaffold, for his [`botw-link` tool](https://github.com/Pistonight/botw-symbols/tree/botw-link),
+and for helping debug and find mistakes.
 - [Shadów](https://github.com/shadowninja108) for helping with decompilation, for
 his [exlaunch](https://github.com/shadowninja108/exlaunch) framework, for helping
 debug crashes, and for his [`crt0` template](https://github.com/shadowninja108/exlaunch/blob/main/source/lib/init/crt0.s).
