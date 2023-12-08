@@ -35,7 +35,7 @@ class Config(TypedDict):
     password: str
 
 
-def upload_mod(ftp: FTP, path: Path=Path('.')) -> None:
+def upload_mod(ftp: FTP, path: Path=Path()) -> None:
     for child in (RELEASE / path).iterdir():
         if child.is_file():
             with open(child, 'rb') as file:
@@ -48,7 +48,7 @@ def upload_mod(ftp: FTP, path: Path=Path('.')) -> None:
             ftp.cwd(directory)
             upload_mod(ftp, path / child)
 
-    if path != Path('.'):
+    if path != Path():
         ftp.cwd('..')
 
 
