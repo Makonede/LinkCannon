@@ -207,11 +207,8 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 // Initialization function (entrypoint)
 extern "C" constexpr auto LinkCannon_init() noexcept {
   // Start all threads
-  for (const auto &thread : std::vector<ThreadFunc>{
-    EventThread, NetworkThread
-  }) [[likely]] {
-    StartThread(thread);
-  }
+  StartThread(EventThread);
+  StartThread(NetworkThread);
 }
 
 
