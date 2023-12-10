@@ -123,7 +123,7 @@ class Server {
       }
       else if (std::is_integral_v<T>) {
         const auto data = Read(sizeof(T));
-        return *reinterpret_cast<T *>(data.data());
+        return *reinterpret_cast<const T *>(data.data());
       }
 
       std::unreachable();

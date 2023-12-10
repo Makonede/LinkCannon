@@ -94,9 +94,10 @@ constexpr auto PORT = static_cast<unsigned short>(52617u);
     // Read from each memory address
     const auto watched = std::map(server->watched);
     lock.unlock();
+    auto code = "DATA"s;
 
     for (const auto &[address, size] : watched) [[likely]] {
-      if (!server->StartMessage(Server::end::SERVER, "DATA"s)) [[unlikely]] {
+      if (!server->StartMessage(Server::end::SERVER, code)) [[unlikely]] {
         break;
       }
 
@@ -206,7 +207,9 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
 // Initialization function (entrypoint)
 extern "C" constexpr auto LinkCannon_init() noexcept {
   // Start all threads
-  for (const auto &thread : {EventThread, NetworkThread}) [[likely]] {
+  for (const auto &thread : std::vector<ThreadFunc>{
+    EventThread, NetworkThread
+  }) [[likely]] {
     StartThread(thread);
   }
 }
