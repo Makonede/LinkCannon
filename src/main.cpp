@@ -192,7 +192,7 @@ constexpr auto NetworkThread([[maybe_unused]] auto *unused) noexcept {
       server->Ack();
 
       // Read and write the data
-      const auto *data = server->Read(size).data();
+      const auto *const data = server->Read(size).data();
       std::memcpy(
         static_cast<void *>(botw::Memory + address),
         static_cast<const void *>(data), size
