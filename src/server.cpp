@@ -41,7 +41,7 @@ auto Server::Init(unsigned short port) noexcept -> bool {
   // Allocate memory for the socket pool
   constexpr auto POOL_SIZE = 0x100000uz;
   constexpr auto ALIGNMENT = 0x1000uz;
-  auto *const pool = std::aligned_alloc(ALIGNMENT, POOL_SIZE);
+  auto *pool = std::aligned_alloc(ALIGNMENT, POOL_SIZE);
 
   if (pool == nullptr) [[unlikely]] {
     return false;
