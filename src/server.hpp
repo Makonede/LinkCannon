@@ -37,13 +37,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using namespace std::literals;
 
 
-inline auto HandleConnProxy(void *server) noexcept;
+inline auto HandleConnProxy(void *const server) noexcept;
 
 
 class Server {
   auto HandleConnection() noexcept -> void;
 
-  friend inline auto HandleConnProxy(void *server) noexcept;
+  friend inline auto HandleConnProxy(void *const server) noexcept;
 
   public:
     enum class sig : unsigned char {
@@ -123,7 +123,7 @@ class Server {
       }
       else if (std::is_integral_v<T>) {
         const auto data = Read(sizeof(T));
-        return *reinterpret_cast<const T *>(data.data());
+        return *reinterpret_cast<const T *const>(data.data());
       }
 
       std::unreachable();
@@ -135,13 +135,15 @@ class Server {
         Send(std::vector<unsigned char>(data.begin(), data.end()));
       }
       else {
-        const auto *dataPtr = reinterpret_cast<const unsigned char *>(&data);
+        const auto *const dataPtr = reinterpret_cast<
+          const unsigned char *const
+        >(&data);
         Send(std::vector(dataPtr, dataPtr + sizeof(T)));
       }
     }
 
     inline auto Send(
-      const unsigned char *data, const std::size_t size
+      const unsigned char *const data, const std::size_t size
     ) noexcept {
       Send(std::vector(data, data + size));
     }
@@ -180,6 +182,6 @@ class Server {
 };
 
 
-inline auto HandleConnProxy(void *server) noexcept {
-  static_cast<Server *>(server)->HandleConnection();
+inline auto HandleConnProxy(void *const server) noexcept {
+  static_cast<Server *const>(server)->HandleConnection();
 }
