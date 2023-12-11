@@ -37,13 +37,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using namespace std::literals;
 
 
-inline auto HandleConnProxy(void *const server) noexcept;
+inline auto HandleConnProxy(void *server) noexcept;
 
 
 class Server {
   auto HandleConnection() noexcept -> void;
 
-  friend inline auto HandleConnProxy(void *const server) noexcept;
+  friend inline auto HandleConnProxy(void *server) noexcept;
 
   public:
     enum class sig : unsigned char {
@@ -182,6 +182,6 @@ class Server {
 };
 
 
-inline auto HandleConnProxy(void *const server) noexcept {
+inline auto HandleConnProxy(void *server) noexcept {
   static_cast<Server *const>(server)->HandleConnection();
 }
