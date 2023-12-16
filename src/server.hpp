@@ -61,15 +61,13 @@ class Server {
       int sock;
 
       switch (endpoint) {
-        case end::CLIENT: {
+        case end::CLIENT:
           sock = clientSocket;
           break;
-        }
 
-        case end::SERVER: {
+        case end::SERVER:
           sock = serverSocket;
           break;
-        }
 
         default: std::unreachable();
       }
