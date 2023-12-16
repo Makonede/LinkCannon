@@ -121,7 +121,7 @@ auto Server::StartMessage(
   const end endpoint, std::string &code
 ) noexcept -> bool {
   switch (endpoint) {
-    case end::CLIENT: {
+    case end::CLIENT:
       // Read the message code
       code = Read<std::string>(4uz);
 
@@ -135,9 +135,8 @@ auto Server::StartMessage(
 
       Ack();
       return true;
-    }
 
-    case end::SERVER: {
+    case end::SERVER:
       // Check if the code exists
       if (std::find(
         SERVER_MESSAGES.begin(), SERVER_MESSAGES.end(), code
@@ -150,7 +149,6 @@ auto Server::StartMessage(
 
       // Check if the client received the message
       return ReadAck();
-    }
   }
 
   std::unreachable();
