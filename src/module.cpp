@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 #define MODULE_NAME "Link Cannon"
-constexpr auto MODULE_NAME_SIZE = sizeof(MODULE_NAME);
+constexpr auto MODULE_NAME_SIZE = sizeof MODULE_NAME;
 
 [[gnu::section(".bss")]]
 char __nx_module_runtime[0xd0uz];
