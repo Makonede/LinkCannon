@@ -31,10 +31,10 @@ to your Switch.
 - If you don't, extract the resulting `patched.zip` (or `patched.tar.xz`) file to
 the root of your microSD card.
 
-> **Note**
+> [!NOTE]
 > If you are asked to overwrite existing files, click `Yes`.
 
-> **Warning**
+> [!WARNING]
 > There is a high chance that this mod will not work with other mods. Using other
 > mods in combination with Link Cannon is not supported — do so at your own risk.
 
@@ -45,7 +45,7 @@ install the latest version.
 
 ## Uninstallation
 
-> **Warning**
+> [!WARNING]
 > If you are using Link Cannon with other mods, this step will remove all of your
 > other Breath of the Wild mods.
 
